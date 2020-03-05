@@ -12,7 +12,7 @@
     "autoprefixer": "9.7.4",
     "rollup": "1.32.0",
     "rollup-plugin-livereload": "1.0.4",
-    "rollup-plugin-postcss": "2.1.1",
+    "rollup-plugin-postcss": "2.2.0",
     "rollup-plugin-stylus-compiler": "1.0.1",
     "rollup-plugin-svelte": "5.1.1",
     "rollup-plugin-terser": "5.2.0",
