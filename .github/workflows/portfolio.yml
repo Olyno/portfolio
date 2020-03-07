@@ -1,0 +1,44 @@
+name: Build and deploy website
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v1
+
+      - name: Setup NodeJS environement
+        uses: actions/setup-node@v1
+        with:
+          node-version: '10.x'
+
+      - uses: actions/cache@v1
+        id: cache-modules
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-yarn
+          restore-keys: |
+            ${{ runner.os }}-yarn
+            
+      - name: Install dependencies
+        if: steps.cache-modules.outputs.cache-hit != 'true'
+        run: yarn install
+
+      - name: Build Website
+        run: yarn build
+      
+      - name: Deploy Website
+        if: success()
+        uses: crazy-max/ghaction-github-pages@v1
+        with:
+          target_branch: gh-pages
+          build_dir: public
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
