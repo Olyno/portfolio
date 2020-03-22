@@ -14,7 +14,7 @@
 </style>
 
 <div class="section">
-    <h1 class="title is-secondary">Who am I?</h1>
+    <h1 class="title is-secondary">About me</h1>
 </div>
 
 <div class="small-section">

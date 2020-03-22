@@ -6,6 +6,8 @@
 
     let modalIsVisible = false;
 
+    console.log(/https?/g.test(project.logo.link) ? project.logo.link : window.location.pathname + project.logo.link);
+
 </script>
 
 <style>
@@ -14,32 +16,36 @@
         margin: auto;
         border-radius: 50px;
         background-color: #586994;
-        box-shadow: 0px -15px 40px #4b597e, 15px 15px 40px #6579aa
+        /* box-shadow: 0px -15px 40px #4b597e, 15px 15px 40px #6579aa */
     }
     .project-card-icon {
         width: 25px;
         height: 25px;
     }
     .card-footer, .card-footer-item { 
-        border-left: none !important;
-        border-right: none !important;
-        border-top: none !important;
-        border-bottom: none !important;
+        border: none !important;
     }
-    .modal-card-head { border-bottom: none !important; }
+    /* .modal-card-head { border-bottom: none !important; } */
     .modal-card-foot { border-top: none !important; }
     .modal-content {
         color: white;
         overflow-wrap: break-word;
     }
+    .is-rounded {
+        border-radius: 50%;
+    }
 </style>
 
-<div class="card project-card">
+<div class="card project-card animate pulse">
     <div class="card-content">
         <div class="media">
             <div class="media-left">
                 <figure class="image is-48x48">
-                    <img src="{window.location.pathname}{project.logo}" alt="Project Logo">
+                    <img
+                        class:is-rounded={project.logo['is-rounded']}
+                        src="{/https?/g.test(project.logo.link) ? project.logo.link : window.location.pathname}{project.logo.link}"
+                        alt="Project Logo"
+                    />
                 </figure>
             </div>
             <div class="media-content">
@@ -82,7 +88,11 @@
                         </div>
                         <div class="level-item">
                             <figure class="image is-32x32">
-                                <img src="{window.location.pathname}{project.logo}" alt="Project Logo">
+                                <img
+                                    class:is-rounded={project.logo['is-rounded']}
+                                    src="{/https?/g.test(project.logo.link) ? project.logo.link : window.location.pathname}{project.logo.link}"
+                                    alt="Project Logo"
+                                />
                             </figure>
                         </div>
                     </div>
