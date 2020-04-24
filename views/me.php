@@ -1,10 +1,11 @@
-<script>
+<?php
 
-    import { stacks } from '../data';
+    $query = 'SELECT * FROM stacks';
+    $stmt = $pdo -> prepare($query);
+    $stmt -> execute([]);
+    $stacks = $stmt -> fetchAll(PDO::FETCH_ASSOC);
 
-    import AnimatedButton from '../components/AnimatedButton.svelte';
-
-</script>
+?>
 
 <style>
     .stack-icon {
@@ -23,17 +24,17 @@
         <div class="column is-5">
             <div class="small-section">
                 <div class="columns is-mobile is-multiline is-centered">
-                    {#each stacks as stack, id}
+                    <?php foreach ($stacks as $stack) { ?>
                         <div class="column is-3" data-aos="slide-up" data-aos-duration="2000" data-aos-delay="{id}50">
                             <div class="contact-card">
-                                {#if stack.icon}
-                                    <i class="stack-icon is-secondary {stack.icon}"></i>
-                                {:else}
-                                    <img class="stack-icon" src="{window.location.pathname}{stack.image}" alt="Stack Icon">
-                                {/if}
+                                <?php if (!strpos($stack['icon'], 'image/')) { ?>
+                                    <i class="stack-icon is-secondary <?php echo $stack['icon']; ?>"></i>
+                                <?php } else { ?>
+                                    <img class="stack-icon" src=".<?php echo $stack['image'] ?>" alt="Stack Icon">
+                                <?php } ?>
                             </div>
                         </div>
-                    {/each}
+                    <?php } ?>
                 </div>
             </div>
         </div>

@@ -9,12 +9,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Service Worker
-    // if ('serviceWorker' in navigator) {
-    //     navigator.serviceWorker
-    //         .register('./serviceWorker.js', { scope: './' })
-    //         .then(console.log('Service Worker Registered'))
-    //         .catch(err => console.log('Service Worker failed', err))
-    // }
-
 })

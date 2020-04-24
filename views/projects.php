@@ -1,10 +1,15 @@
-<script>
+<?php
 
-    import { projects } from '../data';
+    require '../components/project_card.php';
 
-    import ProjectCard from '../components/ProjectCard.svelte';
+    $query = "SELECT * FROM projects";
+    $stmt = $pdo -> prepare($query);
+    $stmt -> execute([]);
+    $projects = $stmt -> fetchAll(PDO::FETCH_ASSOC);
 
-</script>
+    echo var_dump($projects);
+
+?>
 
 <div class="section">
     <h1 class="title is-secondary">My Projects</h1>
@@ -12,11 +17,11 @@
 
 <div class="section">
     <div class="columns is-multiline is-centered">
-        {#each projects as project, id}
+        <?php foreach ($projects as $project) { ?>
             <div class="column is-4" data-aos="fade-down" data-aos-duration="2000" data-aos-delay="{id}50">
-                <ProjectCard {project} /> 
+                <?php projectCard($project) ?>
             </div>
-        {/each}
+        <?php } ?>
         <div class="column is-4 has-text-centered is-vcentered" data-aos="fade-down" data-aos-duration="2000" data-aos-delay="250">
             <a href="https://www.github.com/Olyno" class="is-secondary-bg button animate pulse">See more projects</a>
         </div>

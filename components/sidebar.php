@@ -1,15 +1,7 @@
-<script>
-
-    import AnimatedButton from './AnimatedButton.svelte';
-
-    let visible = false;
-
-</script>
-
 <style>
 
     .sidebar-icon {
-        width: 30px;
+        width: 30px !important;
         height: 30px;
     }
 
@@ -55,9 +47,3 @@
         </a>
     </div>
 </div>
-
-<!-- <button class="button is-primary-bg burger is-hidden-tablet" on:click={() => visible = !visible}>
-    <span class="icon">
-        <i class="fas fa-bars sidebar-icon"></i>
-    </span>
-</button> -->

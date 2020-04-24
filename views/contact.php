@@ -1,13 +1,3 @@
-<script>
-
-    import { contacts } from '../data';
-
-    import AnimatedButton from '../components/AnimatedButton.svelte';
-
-    const isHover = {};
-
-</script>
-
 <style>
     .contact-card {
         display: flex;
