@@ -1,32 +1,41 @@
-const cacheName = 'v1';
-const cacheFiles = [
-    // 'https://www.github.com/Olyno.png',
-    '/build/bundle.css',
-    '/build/bundle.css.map',
-    '/build/bundle.js',
-    '/build/bundle.js.map',
-    '/images/karaom-website.png',
-    '/images/skript-website.png',
-    '/images/skripthub-website.svg',
-    '/images/vixio-website.png',
-    '/images/icons/typescript.svg',
-    '/fontawesome.js',
-    '/utils.js',
-    '/index.html',
-]
+const cacheName = 'pwa-conf-v1';
+const staticAssets = [
+  './',
+  './index.html',
+  './fontawesome.js',
+  './utils.js',
+  './build',
+  './images'
+];
 
-self.addEventListener('install', function(event) {
-    event.waitUntil(
-        caches.open(cacheName).then(function(cache) {
-            return cache.addAll(cacheFiles);
-        })
-    );
+async function networkFirst(req) {
+  const cache = await caches.open(cacheName);
+  try {
+    const fresh = await fetch(req);
+    cache.put(req, fresh.clone());
+    return fresh;
+  } catch (e) {
+    const cachedResponse = await cache.match(req);
+    return cachedResponse;
+  }
+}
+
+async function cacheFirst(req) {
+  const cache = await caches.open(cacheName);
+  const cachedResponse = await cache.match(req);
+  return cachedResponse || networkFirst(req);
+}
+
+window.addEventListener('beforeinstallprompt', event => {
+  event.preventDefault();
+  event.prompt();
 });
 
-self.addEventListener('fetch', function(event) {
-    event.respondWith(
-        caches.match(event.request).then(function(response) {
-            return response || fetch(event.request);
-        })
-    );
+self.addEventListener('install', async event => {
+  caches.open(cacheName)
+    .then(cache => cache.addAll(staticAssets));
+});
+
+self.addEventListener('fetch', event => {
+  event.respondWith(networkFirst(event.request));
 });

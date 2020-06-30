@@ -10,9 +10,13 @@ const concat = require('gulp-concat');
 const connect = require('gulp-connect');
 const stylus = require('gulp-stylus');
 
+const fs = require('fs-extra');
+const axios = require('axios');
+const sharp = require('sharp');
+
 let production = false;
 
-function watchFiles() {
+async function watchFiles() {
     connect.server({
         root: 'public',
         livereload: true,
@@ -22,14 +26,36 @@ function watchFiles() {
     return watch(['src/**/*.svelte'], series(buildingApp, reloadApp));
 }
 
-function buildStyles() {
+async function buildIcons() {
+    const outputDir = 'public/images/icons-pwa';
+    const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+    return fs.emptyDir(outputDir)
+        .then(() => axios({
+            url: 'https://github.com/Olyno.png',
+            responseType: 'stream'
+        })).then(({ data: response }) => {
+            return new Promise((resolve, rejects) => {
+                response.pipe(fs.createWriteStream(`${outputDir}/base.png`));
+                response.on('close', resolve);
+                response.on('error', rejects);
+            })
+        }).then(async () => {
+            for (const size of sizes) {
+                await sharp(`${outputDir}/base.png`)
+                    .resize(size, size)
+                    .toFile(`${outputDir}/icon-${size}x${size}.png`);
+            }
+        }).then(() => fs.remove(`${outputDir}/base.png`));
+}
+
+async function buildStyles() {
     return src('src/**/*.styl')
         .pipe(concat('global.styl'))
         .pipe(stylus())
         .pipe(dest('public/build'))
 }
 
-function buildingApp() {
+async function buildingApp() {
     return rollup.rollup({
         input: 'src/main.js',
         plugins: [
@@ -80,25 +106,25 @@ function buildingApp() {
         .catch(console.error)
 }
 
-function startApp() {
+async function startApp() {
     connect.server({
         root: 'public',
         port: 3000
     });
 }
 
-function reloadApp() {
+async function reloadApp() {
     return src('public/**/*')
         .pipe(connect.reload())
 }
 
-function setup() {
+async function setup() {
     return new Promise((resolve, rejects) => {
         production = true;
         resolve();
     })
 }
 
-exports.build = series(setup, parallel(buildingApp, buildStyles))
+exports.build = series(setup, parallel(buildingApp, buildStyles, buildIcons))
 exports.dev = watchFiles;
 exports.start = startApp;
