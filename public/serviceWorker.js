@@ -26,11 +26,6 @@ async function cacheFirst(req) {
   return cachedResponse || networkFirst(req);
 }
 
-window.addEventListener('beforeinstallprompt', event => {
-  event.preventDefault();
-  event.prompt();
-});
-
 self.addEventListener('install', async event => {
   caches.open(cacheName)
     .then(cache => cache.addAll(staticAssets));
