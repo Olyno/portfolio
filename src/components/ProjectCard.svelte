@@ -6,11 +6,6 @@
 
     export let project;
 
-    let projectCardTitle;
-    let tooltip;
-
-    console.log('Project:', project)
-
 </script>
 
 <style>
@@ -46,7 +41,7 @@
     <div class="card-content">
         <div class="media">
             <div class="media-content">
-                <a class="title is-4 is-secondary isHoveringTitle" href="{project.html_url}" bind:this={projectCardTitle}>
+                <a class="title is-4 is-secondary isHoveringTitle" href="{project.html_url}">
                     {project.name}
                 </a>
             </div>

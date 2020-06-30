@@ -4,8 +4,6 @@
 
     import ProjectCard from '../components/ProjectCard.svelte';
 
-    let projects = [];
-
     const languageOrder = [
         'typescript',
         'javascript',
@@ -14,7 +12,7 @@
         'dart',
         'php'
     ].reverse();
-    
+
     const forgotProjects = [
         "coq-francais",
         "repro-rollup-issue",
@@ -23,7 +21,7 @@
         "portfolio"
     ]
 
-    axios.get('https://api.github.com/users/Olyno/repos')
+    const projectsFilter = axios.get('https://api.github.com/users/Olyno/repos')
         .then(({ data: repositories }) => {
             const filteredRepositories = repositories
                 .filter(repository => repository.language !== null && !forgotProjects.includes(repository.name))
@@ -36,7 +34,10 @@
                         return languageOrder.includes(languageB) ? 1 : -1;
                     }
                 })
-            projects = filteredRepositories;
+            window.localStorage.setItem('repositories', JSON.stringify(filteredRepositories));
+            return filteredRepositories;
+        }).catch(err => {
+            return JSON.parse(window.localStorage.getItem('repositories'));
         })
 
 </script>
@@ -47,11 +48,15 @@
 
 <div class="section">
     <div class="columns is-multiline is-centered">
-        {#each projects as project, id}
-            <div class="column is-4" data-aos="fade-down" data-aos-duration="2000" data-aos-delay="{id}50">
-                <ProjectCard {project} /> 
-            </div>
-        {/each}
+        {#await projectsFilter}
+            <h1 class="subtitle is-secondary">Loading projects...</h1>
+        {:then projects}
+            {#each projects as project, id}
+                <div class="column is-4" data-aos="fade-down" data-aos-duration="2000" data-aos-delay="{id}50">
+                    <ProjectCard {project} /> 
+                </div>
+            {/each}
+        {/await}
         <div class="column is-4 has-text-centered is-vcentered" data-aos="fade-down" data-aos-duration="2000" data-aos-delay="250">
             <a href="https://www.github.com/Olyno" class="is-secondary-bg button animate pulse">See more projects</a>
         </div>
