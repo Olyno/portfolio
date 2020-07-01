@@ -50,14 +50,13 @@
         </a>
     </div>
     <div class="sidebar-link">
+        <a href="#comissions_and_donations">
+            <i class="sidebar-icon is-primary fas fa-hand-holding-usd"></i>
+        </a>
+    </div>
+    <div class="sidebar-link">
         <a href="#contact">
             <i class="sidebar-icon is-primary fas fa-phone"></i>
         </a>
     </div>
 </div>
-
-<!-- <button class="button is-primary-bg burger is-hidden-tablet" on:click={() => visible = !visible}>
-    <span class="icon">
-        <i class="fas fa-bars sidebar-icon"></i>
-    </span>
-</button> -->

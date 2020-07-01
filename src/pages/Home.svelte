@@ -59,7 +59,7 @@
 <div class="centered">
     <div class="columns">
         <div class="column is-narrow">
-            <img class="avatar" src="https://www.github.com/Olyno.png" alt="Olyno Avatar">
+            <img class="avatar" src="/images/icons-pwa/icon-512x512.png" alt="Olyno Avatar">
         </div>
         <div class="column">
             <h1 class="title is-secondary" data-aos="slide-left" data-aos-duration="2000">Hi, I'm Olyno</h1>

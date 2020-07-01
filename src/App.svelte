@@ -4,7 +4,10 @@
     import Home from './pages/Home.svelte';
     import Me from './pages/Me.svelte';
     import Projects from './pages/Projects.svelte';
+    import Comissions from './pages/Comissions.svelte';
     import Contact from './pages/Contact.svelte';
+
+    import Footer from './components/Footer.svelte';
 
 </script>
 
@@ -22,8 +25,12 @@
         <div id="projects">
             <Projects />
         </div>
+        <div id="comissions_and_donations">
+            <Comissions />
+        </div>
         <div id="contact">
             <Contact />
         </div>
+        <Footer />
     </div>
 </div>
