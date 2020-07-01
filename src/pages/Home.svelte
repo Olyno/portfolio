@@ -76,6 +76,7 @@
                         data-aos="slide-left"
                         data-aos-duration="2000"
                         data-aos-delay="300"
+                        on:click={downloadPwa}
                         >Download the PWA</button>
                     <a class:is-hidden={!shouldScroll}
                         href="#me"
