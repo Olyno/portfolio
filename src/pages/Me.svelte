@@ -24,7 +24,7 @@
             <div class="small-section">
                 <div class="columns is-mobile is-multiline is-centered">
                     {#each stacks as stack, id}
-                        <div class="column is-3" data-aos="slide-up" data-aos-duration="2000" data-aos-delay="{id}50">
+                        <div class="column is-4" data-aos="slide-up" data-aos-duration="2000" data-aos-delay="{id}50">
                             <div class="contact-card">
                                 {#if stack.icon}
                                     <i class="stack-icon is-secondary {stack.icon}"></i>
@@ -42,7 +42,7 @@
             <div class="small-section">
                 <p class="is-secondary" data-aos="slide-left" data-aos-duration="1500">
                     From my real first name Leo, but from my username Olyno, I'm a young French developer.<br>
-                    Specialized in frontend, I'm still able to be full stack. I master SvelteJs and ReactJS for the frontend, and NodeJs for the backend.<br>
+                    Specialized in frontend, I'm still able to be full stack. I master SvelteJs, ReactJS and Angular for the frontend, and NodeJs with NestJs for the backend.<br>
                 </p>
             </div>
         </div>

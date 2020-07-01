@@ -27,6 +27,10 @@ export const stacks = [
         "icon": "fab fa-react"
     },
     {
+        "name": "Angular",
+        "icon": "fab fa-angular"
+    },
+    {
         "name": "NodeJS",
         "icon": "fab fa-node-js"
     },
@@ -37,5 +41,9 @@ export const stacks = [
     {
         "name": "Typescript",
         "image": "images/icons/typescript.svg"
+    },
+    {
+        "name": "NestJs",
+        "image": "images/icons/nestjs.svg"
     }
 ]
