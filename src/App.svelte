@@ -6,8 +6,6 @@
     import Projects from './pages/Projects.svelte';
     import Contact from './pages/Contact.svelte';
 
-    import PwaBanner from './components/PwaBanner.svelte';
-
 </script>
 
 <div class="columns">
@@ -29,5 +27,3 @@
         </div>
     </div>
 </div>
-
-<PwaBanner />
