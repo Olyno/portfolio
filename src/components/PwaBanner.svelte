@@ -9,7 +9,7 @@
 
     async function hidePwaBanner() {
         window.localStorage.setItem('pwa_banner_visibility', false);
-        hidding = true;
+        hiddingPwaBanner = true;
     }
 
 </script>
