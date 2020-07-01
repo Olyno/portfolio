@@ -52,7 +52,7 @@
             <h1 class="subtitle is-secondary">Loading projects...</h1>
         {:then projects}
             {#each projects as project, id}
-                <div class="column is-4" data-aos="fade-down" data-aos-duration="2000" data-aos-delay="{id}50">
+                <div class="column is-4" data-aos="fade-down" data-aos-duration="1000" data-aos-delay="{id}50">
                     <ProjectCard {project} /> 
                 </div>
             {/each}
