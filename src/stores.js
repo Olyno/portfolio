@@ -3,16 +3,30 @@ import { writable } from 'svelte/store';
 // Languages
 
 import englishLanguage from '../public/locale/en.json';
-import frenchLanguage from '../public/locale/fr-FR.json';
+import frenchLanguage from '../public/locale/fr.json';
 
-const defaultLanguage = window.localStorage.getItem('language') || navigator.language || navigator.userLanguage;
+let defaultLanguage = window.navigator.languages ? window.navigator.languages[0] : null;
+defaultLanguage = window.localStorage.getItem('language')
+    || defaultLanguage
+    || window.navigator.language
+    || window.navigator.browserLanguage
+    || window.navigator.userLanguage
+    || 'en';
+
+if (defaultLanguage.indexOf('-') !== -1) {
+    defaultLanguage = defaultLanguage.split('-')[0];
+}
+
+if (defaultLanguage.indexOf('_') !== -1) {
+    defaultLanguage = defaultLanguage.split('_')[0];
+}
 
 export const languages = {
     en: {
         name: 'english',
         translations: englishLanguage
     },
-    'fr-FR': {
+    fr: {
         name: 'français',
         translations: frenchLanguage
     }
