@@ -2,8 +2,6 @@
 
     import { onMount } from 'svelte';
 
-    import AnimatedButton from './AnimatedButton.svelte';
-
     export let project;
 
 </script>

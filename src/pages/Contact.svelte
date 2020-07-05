@@ -1,8 +1,7 @@
 <script>
 
     import { contacts } from '../data';
-
-    import AnimatedButton from '../components/AnimatedButton.svelte';
+    import { translations as _ } from '../stores';
 
     const isHover = {};
 
@@ -27,7 +26,7 @@
 </style>
 
 <div class="section">
-    <h1 class="title is-secondary">Contact Me</h1>
+    <h1 class="title is-secondary">{$_.contact.title}</h1>
 </div>
 
 <div class="small-section">
@@ -35,7 +34,7 @@
 
         <div class="column">
             <div class="small-section" data-aos="fade-up" data-aos-duration="2000">
-                <h1 class="title is-4 is-secondary">You can contact me via email</h1>
+                <h1 class="title is-4 is-secondary">{$_.contact.email_contact}</h1>
                 <a class="is-secondary" href="mailto:olyno.dev@gmail.com">
                     olyno.dev@gmail.com
                 </a>
@@ -43,7 +42,7 @@
         </div>
 
         <div class="column">
-            <h1 class="title is-4 is-secondary small-section" data-aos="fade-up" data-aos-duration="2000">Or simply send me a message</h1>
+            <h1 class="title is-4 is-secondary small-section" data-aos="fade-up" data-aos-duration="2000">{$_.contact.message_contact}</h1>
             <div class="columns is-mobile is-multiline">
                 {#each contacts as contact, id}
                     <div class="column is-3" data-aos="fade-up" data-aos-duration="2000" data-aos-delay="{id}50">

@@ -7,9 +7,12 @@
     import Comissions from './pages/Comissions.svelte';
     import Contact from './pages/Contact.svelte';
 
+    import Options from './components/Options.svelte';
     import Footer from './components/Footer.svelte';
 
 </script>
+
+<Options />
 
 <div class="columns">
     <div class="column is-1 is-secondary-bg is-sidebar is-hidden-mobile">

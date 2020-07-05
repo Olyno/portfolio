@@ -1,0 +1,26 @@
+{
+    "contact": {
+        "title": "Contactez moi",
+        "email_contact": "Vous pouvez me contacter par email",
+        "message_contact": "Ou simplement m'envoyer un message",
+        "pwa": "Télécharger la PWA"
+    },
+    "about_me": {
+        "title": "A propos de moi",
+        "description": "De mon vrai prénom Léo, mais de mon nom d'utilisateur Olyno, Je suis un jeune développeur français.\nSpécialisé dans le frontend, je reste capable d'être full stack. Je maitrise SvelteJs ReactJs et Angular pour le frontend, et NodeJs avec NestJs pour le backend.\n",
+        "welcome": "Salut, je suis Olyno",
+        "fast_description": "Développeur français en freelance"
+    },
+    "projects": {
+        "title": "Mes projects",
+        "loading": "Chargement des projets...",
+        "see_more": "Voir plus de projets"
+    },
+    "comissions": {
+        "title": "Comissions et Donations",
+        "description": "Besoin d'une comission ? Ou simplement vouloir faire une donation ?"
+    },
+    "options": {
+        "change_language": "Changer de langue"
+    }
+}

@@ -3,6 +3,7 @@ const svelte = require('rollup-plugin-svelte');
 const resolve = require('@rollup/plugin-node-resolve').default;
 const commonjs = require('@rollup/plugin-commonjs');
 const postcss = require('rollup-plugin-postcss');
+const json = require('@rollup/plugin-json');
 const { terser } = require('rollup-plugin-terser');
 
 const { src, dest, watch, parallel, series } = require('gulp');
@@ -23,7 +24,7 @@ async function watchFiles() {
         port: 3000
     });
     watch(['src/**/*.styl'], series(buildStyles, reloadApp));
-    return watch(['src/**/*.svelte'], series(buildingApp, reloadApp));
+    return watch(['src/**/*.svelte', 'src/**/*.js'], series(buildingApp, reloadApp));
 }
 
 async function buildIcons() {
@@ -89,6 +90,7 @@ async function buildingApp() {
                 dedupe: ['svelte']
             }),
             commonjs(),
+            json(),
     
             // If we're building for production (npm run build
             // instead of npm run dev), minify

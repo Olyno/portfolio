@@ -1,0 +1,26 @@
+{
+    "contact": {
+        "title": "Contact Me",
+        "email_contact": "You can contact me via email",
+        "message_contact": "Or simply send me a message",
+        "pwa": "Download the PWA"
+    },
+    "about_me": {
+        "title": "About me",
+        "description": "From my real first name Leo, but from my username Olyno, I'm a young French developer.\nSpecialized in frontend, I'm still able to be full stack. I master SvelteJs, ReactJS and Angular for the frontend, and NodeJs with NestJs for the backend.\n",
+        "welcome": "Hi, I'm Olyno",
+        "fast_description": "French Web developer, Freelancer"
+    },
+    "projects": {
+        "title": "My Projects",
+        "loading": "Loading projects...",
+        "see_more": "See more projects"
+    },
+    "comissions": {
+        "title": "Comissions and Donations",
+        "description": "Need a comission? Or simply want to make a donation?"
+    },
+    "options": {
+        "change_language": "Change language"
+    }
+}

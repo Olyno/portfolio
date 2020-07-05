@@ -1,7 +1,5 @@
 <script>
 
-    import AnimatedButton from './AnimatedButton.svelte';
-
     let visible = false;
 
 </script>

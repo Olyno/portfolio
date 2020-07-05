@@ -1,8 +1,7 @@
 <script>
 
     import { stacks } from '../data';
-
-    import AnimatedButton from '../components/AnimatedButton.svelte';
+    import { translations as _ } from '../stores';
 
 </script>
 
@@ -14,7 +13,7 @@
 </style>
 
 <div class="section">
-    <h1 class="title is-secondary">About me</h1>
+    <h1 class="title is-secondary">{$_.about_me.title}</h1>
 </div>
 
 <div class="small-section">
@@ -41,8 +40,7 @@
         <div class="column">
             <div class="small-section">
                 <p class="is-secondary" data-aos="slide-left" data-aos-duration="1500">
-                    From my real first name Leo, but from my username Olyno, I'm a young French developer.<br>
-                    Specialized in frontend, I'm still able to be full stack. I master SvelteJs, ReactJS and Angular for the frontend, and NodeJs with NestJs for the backend.<br>
+                    {@html $_.about_me.description.replace(/\n/g, '<br>')}
                 </p>
             </div>
         </div>
