@@ -1,5 +1,7 @@
 <script>
 
+    import { translations as _ } from '../stores';
+    
     let visible = false;
 
 </script>
@@ -33,27 +35,27 @@
 
 <div class="sidebar-content animated slideInLeft">
     <div class="sidebar-link">
-        <a href="#home">
+        <a aria-label="{$_.about_me.home_button}" href="#home">
             <i class="sidebar-icon is-primary fas fa-home"></i>
         </a>
     </div>
     <div class="sidebar-link">
-        <a href="#me">
+        <a aria-label="{$_.about_me.button}" href="#me">
             <i class="sidebar-icon is-primary fas fa-user"></i>
         </a>
     </div>
     <div class="sidebar-link">
-        <a href="#projects">
+        <a aria-label="{$_.projects.button}" href="#projects">
             <i class="sidebar-icon is-primary fas fa-folder"></i>
         </a>
     </div>
     <div class="sidebar-link">
-        <a href="#comissions_and_donations">
+        <a aria-label="{$_.comissions.button}" href="#comissions_and_donations">
             <i class="sidebar-icon is-primary fas fa-hand-holding-usd"></i>
         </a>
     </div>
     <div class="sidebar-link">
-        <a href="#contact">
+        <a aria-label="{$_.contact.button}" href="#contact">
             <i class="sidebar-icon is-primary fas fa-phone"></i>
         </a>
     </div>

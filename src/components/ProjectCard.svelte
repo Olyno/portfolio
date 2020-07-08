@@ -1,6 +1,7 @@
 <script>
 
     import { onMount } from 'svelte';
+    import { translations as _ } from '../stores';
 
     export let project;
 
@@ -39,7 +40,7 @@
     <div class="card-content">
         <div class="media">
             <div class="media-content">
-                <a class="title is-4 is-secondary isHoveringTitle" href="{project.html_url}">
+                <a aria-label="{$_.links.project}" class="title is-4 is-secondary isHoveringTitle" href="{project.html_url}">
                     {project.name}
                 </a>
             </div>

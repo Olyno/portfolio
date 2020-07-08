@@ -18,7 +18,7 @@
     <div class="columns is-centered has-text-centered">
         <div class="column" data-aos="fade-up" data-aos-duration="2000">
             <h1 class="subtitle is-secondary">{$_.comissions.description}</h1>
-            <a class="ko-fi-button" rel="noreferrer" target="_blank" href="https://ko-fi.com/olyno">
+            <a aria-label="{$_.links['ko-fi']}" class="ko-fi-button" rel="noreferrer" target="_blank" href="https://ko-fi.com/olyno">
                 <img src="/images/buymeakofi.png" alt="Ko-Fi Comission Button">
             </a>
         </div>

@@ -35,7 +35,7 @@
         <div class="column">
             <div class="small-section" data-aos="fade-up" data-aos-duration="2000">
                 <h1 class="title is-4 is-secondary">{$_.contact.email_contact}</h1>
-                <a class="is-secondary" href="mailto:olyno.dev@gmail.com">
+                <a aria-label="{$_.contact.using} email" class="is-secondary" href="mailto:olyno.dev@gmail.com">
                     olyno.dev@gmail.com
                 </a>
             </div>
@@ -52,7 +52,7 @@
                             on:mouseenter={() => isHover[id] = true}
                             on:mouseleave={() => isHover[id] = false}
                         >
-                            <a href="{contact.link}" target="_blank">
+                            <a aria-label="{$_.contact.using} {contact.name}" href="{contact.link}" target="_blank">
                                 <i class="contact-card-icon is-secondary {contact.icon}"></i>
                             </a>
                         </div>

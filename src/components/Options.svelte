@@ -1,7 +1,7 @@
 <script>
 
     import { onMount } from 'svelte';
-    import { language } from '../stores';
+    import { language, translations as _ } from '../stores';
 
     import Language from './options/Language.svelte';
 
@@ -83,14 +83,14 @@
 <svelte:window on:beforeinstallprompt|preventDefault={event => pwa = event} />
 
 <div class="options">
-    <button class="is-secondary-bg" on:click={showOptionsList}>
+    <button aria-label="{$_.options.title}" class="is-secondary-bg" on:click={showOptionsList}>
         <i class="is-primary fas fa-cogs"></i>
     </button>
     <div class="optionsList" class:is-hidden={!showOptions}>
-        <button class="is-secondary-bg is-primary" on:click={() => selectedOption = 'language'}>
+        <button aria-label="{$_.options.language}" class="is-secondary-bg is-primary" on:click={() => selectedOption = 'language'}>
             <i class="optionIcon fas fa-comment-dots"></i>
         </button>
-        <button class="is-secondary-bg is-primary" class:is-hidden={!shouldInstallPwa} on:click={downloadPwa}>
+        <button aria-label="{$_.contact.pwa}" class="is-secondary-bg is-primary" class:is-hidden={!shouldInstallPwa} on:click={downloadPwa}>
             <i class="fas fa-download"></i>
         </button>
     </div>

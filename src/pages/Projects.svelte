@@ -59,7 +59,7 @@
             {/each}
         {/await}
         <div class="column is-4 has-text-centered is-vcentered" data-aos="fade-down" data-aos-duration="2000" data-aos-delay="250">
-            <a href="https://www.github.com/Olyno" class="is-secondary-bg button animate pulse">{$_.projects.see_more}</a>
+            <a aria-label="{$_.links.github}" href="https://www.github.com/Olyno" class="is-secondary-bg button animate pulse">{$_.projects.see_more}</a>
         </div>
     </div>
 </div>

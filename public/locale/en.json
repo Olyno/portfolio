@@ -3,24 +3,37 @@
         "title": "Contact Me",
         "email_contact": "You can contact me via email",
         "message_contact": "Or simply send me a message",
-        "pwa": "Download the PWA"
+        "pwa": "Download the PWA",
+        "button": "Go to contact",
+        "using": "Contact me with my"
     },
     "about_me": {
         "title": "About me",
         "description": "From my real first name Leo, but from my username Olyno, I'm a young French developer.\nSpecialized in frontend, I'm still able to be full stack. I master SvelteJs, ReactJS and Angular for the frontend, and NodeJs with NestJs for the backend.\n",
         "welcome": "Hi, I'm Olyno",
-        "fast_description": "French Web developer, Freelancer"
+        "fast_description": "French Web developer, Freelancer",
+        "home_button": "Go to home",
+        "button": "Go to about me"
     },
     "projects": {
         "title": "My Projects",
         "loading": "Loading projects...",
-        "see_more": "See more projects"
+        "see_more": "See more projects",
+        "button": "Go to my projects"
     },
     "comissions": {
         "title": "Comissions and Donations",
-        "description": "Need a comission? Or simply want to make a donation?"
+        "description": "Need a comission? Or simply want to make a donation?",
+        "button": "Go to donations and comissions"
     },
     "options": {
+        "title": "Options",
+        "language": "Language option",
         "change_language": "Change language"
+    },
+    "links": {
+        "project": "Go see the project",
+        "github": "Go see my Github",
+        "ko-fi": "Go see my ko-fi page"
     }
 }
