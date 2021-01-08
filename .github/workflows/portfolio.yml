@@ -18,7 +18,13 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: '10.x'
-            
+      
+      - name: Load cached dependencies
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+                
       - name: Install dependencies
         run: yarn install
 
