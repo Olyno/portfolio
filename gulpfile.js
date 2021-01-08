@@ -6,7 +6,6 @@ const json = require('@rollup/plugin-json');
 const { terser } = require('rollup-plugin-terser');
 const css = require('rollup-plugin-css-only');
 const compiler = require('@ampproject/rollup-plugin-closure-compiler');
-const purgecss = require('rollup-plugin-purgecss');
 
 const { src, dest, watch, parallel, series } = require('gulp');
 const concat = require('gulp-concat');
@@ -90,7 +89,6 @@ async function buildingApp() {
     
             // If we're building for production (npm run build
             // instead of npm run dev), minify
-            production && purgecss(),
             production && terser(),
             production && compiler(),
         ]
