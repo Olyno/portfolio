@@ -26,7 +26,7 @@
 </style>
 
 <div class="section">
-    <h1 class="title is-secondary" ata-aos="slide-right" data-aos-duration="1000">{$_.contact.title}</h1>
+    <h1 class="title is-secondary" data-aos="slide-right" data-aos-duration="1000">{$_.contact.title}</h1>
 </div>
 
 <div class="small-section">
