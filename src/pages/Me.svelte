@@ -7,13 +7,13 @@
 
 <style>
     .stack-icon {
-        width: 100px;
-        height: 60px;
+        width: 50%;
+        height: 50%;
     }
 </style>
 
 <div class="section">
-    <h1 class="title is-secondary">{$_.about_me.title}</h1>
+    <h1 class="title is-secondary" data-aos="slide-right" data-aos-duration="1000">{$_.about_me.title}</h1>
 </div>
 
 <div class="small-section">
@@ -23,12 +23,15 @@
             <div class="small-section">
                 <div class="columns is-mobile is-multiline is-centered">
                     {#each stacks as stack, id}
-                        <div class="column is-4" data-aos="slide-up" data-aos-duration="2000" data-aos-delay="{id}50">
-                            <div class="contact-card">
+                        <div class="column is-4">
+                            <div data-aos="fade-up" data-aos-duration="2000" data-aos-delay="{id}00">
                                 {#if stack.icon}
                                     <i class="stack-icon is-secondary {stack.icon}"></i>
                                 {:else}
-                                    <img class="stack-icon" src="{window.location.pathname}{stack.image}" alt="Stack Icon">
+                                    <img class="stack-icon lazyload"
+                                        data-sizes="auto"
+                                        data-src="{window.location.pathname}{stack.image}"
+                                        alt="Stack Icon">
                                 {/if}
                             </div>
                         </div>
@@ -39,7 +42,7 @@
 
         <div class="column">
             <div class="small-section">
-                <p class="is-secondary" data-aos="slide-left" data-aos-duration="1500">
+                <p class="is-secondary" data-aos="fade-up" data-aos-duration="2000">
                     {@html $_.about_me.description.replace(/\n/g, '<br>')}
                 </p>
             </div>

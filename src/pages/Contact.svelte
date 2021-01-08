@@ -17,7 +17,7 @@
         height: 60px;
         border-radius: 10px;
         background: #586994;
-        box-shadow: 6px 6px 12px #4b597e, -6px -6px 12px #6579aa;
+        box-shadow: 6px 6px 12px #4b597e, -2px -2px 1px #6579aa;
     }
     .contact-card-icon {
         width: 30px;
@@ -26,7 +26,7 @@
 </style>
 
 <div class="section">
-    <h1 class="title is-secondary">{$_.contact.title}</h1>
+    <h1 class="title is-secondary" ata-aos="slide-right" data-aos-duration="1000">{$_.contact.title}</h1>
 </div>
 
 <div class="small-section">
@@ -45,14 +45,16 @@
             <h1 class="title is-4 is-secondary small-section" data-aos="fade-up" data-aos-duration="2000">{$_.contact.message_contact}</h1>
             <div class="columns is-mobile is-multiline">
                 {#each contacts as contact, id}
-                    <div class="column is-3" data-aos="fade-up" data-aos-duration="2000" data-aos-delay="{id}50">
+                    <div class="column is-3">
                         <div
-                            class="contact-card animated"
+                            data-aos="fade-up"
+                            data-aos-duration="{id}000"
+                            class="contact-card"
                             class:jello={isHover[id]}
                             on:mouseenter={() => isHover[id] = true}
                             on:mouseleave={() => isHover[id] = false}
                         >
-                            <a aria-label="{$_.contact.using} {contact.name}" href="{contact.link}" target="_blank">
+                            <a aria-label="{$_.contact.using} {contact.name}" href="{contact.link}" rel="noreferrer" target="_blank">
                                 <i class="contact-card-icon is-secondary {contact.icon}"></i>
                             </a>
                         </div>

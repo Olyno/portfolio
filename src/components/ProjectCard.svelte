@@ -31,7 +31,7 @@
     }
 </style>
 
-<div class="card project-card animate pulse">
+<div class="card project-card animate pulse" data-aos="fade-up" data-aos-duration="2000">
     <div class="actions-buttons">
         <p><i class="is-secondary fas fa-eye"></i> {project.watchers_count}</p>
         <p><i class="is-secondary fas fa-star"></i> {project.stargazers_count}</p>

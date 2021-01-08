@@ -2,9 +2,11 @@ const rollup = require('rollup');
 const svelte = require('rollup-plugin-svelte');
 const resolve = require('@rollup/plugin-node-resolve').default;
 const commonjs = require('@rollup/plugin-commonjs');
-const postcss = require('rollup-plugin-postcss');
 const json = require('@rollup/plugin-json');
 const { terser } = require('rollup-plugin-terser');
+const css = require('rollup-plugin-css-only');
+const compiler = require('@ampproject/rollup-plugin-closure-compiler');
+const purgecss = require('rollup-plugin-purgecss');
 
 const { src, dest, watch, parallel, series } = require('gulp');
 const concat = require('gulp-concat');
@@ -45,6 +47,12 @@ async function buildIcons() {
                 await sharp(`${outputDir}/base.png`)
                     .resize(size, size)
                     .toFile(`${outputDir}/icon-${size}x${size}.png`);
+                await sharp(`${outputDir}/base.png`)
+                    .resize(size, size)
+                    .toFile(`${outputDir}/icon-${size}x${size}.webp`);
+                await sharp(`${outputDir}/base.png`)
+                    .resize(size, size)
+                    .toFile(`${outputDir}/icon-${size}x${size}.avif`);
             }
         }).then(() => fs.remove(`${outputDir}/base.png`));
 }
@@ -60,25 +68,13 @@ async function buildingApp() {
     return rollup.rollup({
         input: 'src/main.js',
         plugins: [
-
-            // Import Bulma CSS and more!
-            postcss({
-                include: '**/*.css',
-                plugins: [
-                    require('autoprefixer')
-                ]
-            }),
     
             // Svelte files compilation
-            svelte({
-                // enable run-time checks when not in production
-                dev: !production,
-                // we'll extract any component CSS out into
-                // a separate file - better for performance
-                css: css => {
-                    css.write('public/build/bundle.css');
-                }
-            }),
+            svelte(),
+
+            // we'll extract any component CSS out into
+		    // a separate file - better for performance
+            css({ output: 'bundle.css' }),
     
             // If you have external dependencies installed from
             // npm, you'll most likely need these plugins. In
@@ -94,15 +90,22 @@ async function buildingApp() {
     
             // If we're building for production (npm run build
             // instead of npm run dev), minify
-            production && terser()
+            production && purgecss(),
+            production && terser(),
+            production && compiler(),
         ]
     })
         .then(bundle => {
+            bundle.write({
+                sourcemap: true,
+                format: 'es',
+                file: 'public/build/modern/bundle.js'
+            })
             return bundle.write({
                 sourcemap: true,
                 format: 'iife',
                 name: 'app',
-                file: 'public/build/bundle.js'
+                file: 'public/build/legacy/bundle.js'
             })
         })
         .catch(console.error)
@@ -120,13 +123,13 @@ async function reloadApp() {
         .pipe(connect.reload())
 }
 
-async function setup() {
+async function makeProd() {
     return new Promise((resolve, rejects) => {
         production = true;
         resolve();
     })
 }
 
-exports.build = series(setup, parallel(buildingApp, buildStyles, buildIcons))
-exports.dev = watchFiles;
+exports.build = series(makeProd, parallel(buildingApp, buildStyles, buildIcons))
+exports.dev = parallel(watchFiles, buildStyles, buildingApp);
 exports.start = startApp;

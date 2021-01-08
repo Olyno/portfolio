@@ -25,7 +25,7 @@
     const projectsFilter = axios.get('https://api.github.com/users/Olyno/repos')
         .then(({ data: repositories }) => {
             const filteredRepositories = repositories
-                .filter(repository => repository.language !== null && !forgotProjects.includes(repository.name))
+                .filter(repository => repository.language !== null && !forgotProjects.includes(repository.name) && !repository.fork)
                 .sort((a, b) => {
                     const languageA = a.language.toLowerCase();
                     const languageB = b.language.toLowerCase();
@@ -38,13 +38,13 @@
             window.localStorage.setItem('repositories', JSON.stringify(filteredRepositories));
             return filteredRepositories;
         }).catch(err => {
-            return JSON.parse(window.localStorage.getItem('repositories'));
+            return JSON.parse(window.localStorage.getItem('repositories')) || [];
         })
 
 </script>
 
 <div class="section">
-    <h1 class="title is-secondary">{$_.projects.title}</h1>
+    <h1 class="title is-secondary" data-aos="slide-right" data-aos-duration="1000">{$_.projects.title}</h1>
 </div>
 
 <div class="section">
@@ -53,13 +53,18 @@
             <h1 class="subtitle is-secondary">{$_.projects.loading}</h1>
         {:then projects}
             {#each projects as project, id}
-                <div class="column is-4" data-aos="fade-down" data-aos-duration="1000" data-aos-delay="{id}50">
+                <div class="column is-4">
                     <ProjectCard {project} /> 
                 </div>
             {/each}
         {/await}
-        <div class="column is-4 has-text-centered is-vcentered" data-aos="fade-down" data-aos-duration="2000" data-aos-delay="250">
-            <a aria-label="{$_.links.github}" href="https://www.github.com/Olyno" class="is-secondary-bg button animate pulse">{$_.projects.see_more}</a>
+        <div class="column is-4 has-text-centered is-vcentered">
+            <a rel="noreferrer"
+                data-aos="fade-up"
+                data-aos-duration="2000"
+                aria-label="{$_.links.github}"
+                href="https://www.github.com/Olyno"
+                class="is-secondary-bg button">{$_.projects.see_more}</a>
         </div>
     </div>
 </div>

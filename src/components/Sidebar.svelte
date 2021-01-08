@@ -1,8 +1,7 @@
 <script>
 
     import { translations as _ } from '../stores';
-    
-    let visible = false;
+
 
 </script>
 
@@ -33,7 +32,7 @@
 
 </style>
 
-<div class="sidebar-content animated slideInLeft">
+<div class="sidebar-content">
     <div class="sidebar-link">
         <a aria-label="{$_.about_me.home_button}" href="#home">
             <i class="sidebar-icon is-primary fas fa-home"></i>
