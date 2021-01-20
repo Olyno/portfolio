@@ -10,6 +10,9 @@
         width: 50%;
         height: 50%;
     }
+    .description-text {
+        font-size: 18px;
+    }
 </style>
 
 <div class="section">
@@ -42,7 +45,7 @@
 
         <div class="column">
             <div class="small-section">
-                <p class="is-secondary" data-aos="fade-up" data-aos-duration="2000">
+                <p class="is-secondary description-text" data-aos="fade-up" data-aos-duration="2000">
                     {@html $_.about_me.description.replace(/\n/g, '<br>')}
                 </p>
             </div>

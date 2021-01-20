@@ -2,7 +2,7 @@
   "name": "svelte-app",
   "version": "1.0.0",
   "scripts": {
-    "build": "gulp build",
+    "build": "rimraf public/images/icons-pwa && gulp build",
     "dev": "gulp dev",
     "start": "gulp start"
   },
@@ -11,16 +11,21 @@
     "@rollup/plugin-commonjs": "^17.0.0",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^11.0.1",
+    "autoprefixer": "^9.0.0",
+    "cssnano": "^4.1.10",
     "fs-extra": "^9.0.1",
     "gulp": "^4.0.2",
     "gulp-concat": "^2.6.1",
     "gulp-connect": "^5.7.0",
     "gulp-stylus": "^2.7.0",
+    "postcss": "7.0.35",
+    "rimraf": "^3.0.2",
     "rollup": "^2.36.1",
-    "rollup-plugin-css-only": "^3.1.0",
+    "rollup-plugin-postcss": "^4.0.0",
     "rollup-plugin-svelte": "^7.0.0",
     "rollup-plugin-terser": "^7.0.2",
     "sharp": "^0.27.0",
+    "stylus": "^0.54.8",
     "svelte": "^3.31.2"
   },
   "dependencies": {

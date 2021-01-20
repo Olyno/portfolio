@@ -28,7 +28,12 @@
                 <picture>
                     <source data-srcset="/images/logos/buymeakofi.avif" type="image/avif">
                     <source data-srcset="/images/logos/buymeakofi.webp" type="image/webp">
-                    <img class="lazyload" data-sizes="auto" data-src="/images/logos/buymeakofi.png" alt="Ko-Fi Comission Button">
+                    <img class="lazyload"
+                        data-sizes="auto"
+                        data-aos="fade-up"
+                        data-aos-duration="2000"
+                        data-src="/images/logos/buymeakofi.png"
+                        alt="Ko-Fi Comission Button" />
                 </picture>
             </a>
         </div>

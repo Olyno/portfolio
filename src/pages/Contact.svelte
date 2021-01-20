@@ -3,8 +3,6 @@
     import { contacts } from '../data';
     import { translations as _ } from '../stores';
 
-    const isHover = {};
-
 </script>
 
 <style>
@@ -49,10 +47,8 @@
                         <div
                             data-aos="fade-up"
                             data-aos-duration="{id}000"
+                            data-aos-delay="100"
                             class="contact-card"
-                            class:jello={isHover[id]}
-                            on:mouseenter={() => isHover[id] = true}
-                            on:mouseleave={() => isHover[id] = false}
                         >
                             <a aria-label="{$_.contact.using} {contact.name}" href="{contact.link}" rel="noreferrer" target="_blank">
                                 <i class="contact-card-icon is-secondary {contact.icon}"></i>

@@ -4,13 +4,11 @@ const resolve = require('@rollup/plugin-node-resolve').default;
 const commonjs = require('@rollup/plugin-commonjs');
 const json = require('@rollup/plugin-json');
 const { terser } = require('rollup-plugin-terser');
-const css = require('rollup-plugin-css-only');
+const postcss = require('rollup-plugin-postcss');
 const compiler = require('@ampproject/rollup-plugin-closure-compiler');
 
 const { src, dest, watch, parallel, series } = require('gulp');
-const concat = require('gulp-concat');
 const connect = require('gulp-connect');
-const stylus = require('gulp-stylus');
 
 const fs = require('fs-extra');
 const axios = require('axios');
@@ -19,12 +17,13 @@ const sharp = require('sharp');
 let production = false;
 
 async function watchFiles() {
+    console.log('Watching files...')
     connect.server({
         root: 'public',
         livereload: true,
         port: 3000
     });
-    watch(['src/**/*.styl'], series(buildStyles, reloadApp));
+    watch(['src/**/*.styl'], reloadApp);
     return watch(['src/**/*.svelte', 'src/**/*.js'], series(buildingApp, reloadApp));
 }
 
@@ -56,24 +55,16 @@ async function buildIcons() {
         }).then(() => fs.remove(`${outputDir}/base.png`));
 }
 
-async function buildStyles() {
-    return src('src/**/*.styl')
-        .pipe(concat('global.styl'))
-        .pipe(stylus())
-        .pipe(dest('public/build'))
-}
-
 async function buildingApp() {
     return rollup.rollup({
         input: 'src/main.js',
         plugins: [
-    
+
             // Svelte files compilation
             svelte(),
 
             // we'll extract any component CSS out into
 		    // a separate file - better for performance
-            css({ output: 'bundle.css' }),
     
             // If you have external dependencies installed from
             // npm, you'll most likely need these plugins. In
@@ -86,6 +77,14 @@ async function buildingApp() {
             }),
             commonjs(),
             json(),
+
+            postcss({
+                plugins: [
+                    require('autoprefixer'),
+                    require('cssnano'),
+                ],
+                extract: true
+            }),
     
             // If we're building for production (npm run build
             // instead of npm run dev), minify
@@ -128,6 +127,6 @@ async function makeProd() {
     })
 }
 
-exports.build = series(makeProd, parallel(buildingApp, buildStyles, buildIcons))
-exports.dev = parallel(watchFiles, buildStyles, buildingApp);
+exports.build = series(makeProd, parallel(buildingApp, buildIcons))
+exports.dev = parallel(watchFiles, buildingApp);
 exports.start = startApp;

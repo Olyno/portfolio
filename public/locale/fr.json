@@ -8,7 +8,7 @@
     },
     "about_me": {
         "title": "A propos de moi",
-        "description": "De mon vrai prénom Léo, mais de mon nom d'utilisateur Olyno, Je suis un jeune développeur français.\nSpécialisé dans le frontend, je reste capable d'être full stack. Je maitrise SvelteJs ReactJs et Angular pour le frontend, et NodeJs avec NestJs pour le backend.\n",
+        "description": "De mon vrai nom Léo, mais de mon nom d'utilisateur Olyno, Je suis un jeune développeur français.\nSpécialisé dans le frontend, je reste capable d'être full stack. Je maitrise SvelteJs ReactJs et Angular pour le frontend, et NodeJs avec NestJs pour le backend.\n",
         "welcome": "Salut, je suis Olyno",
         "fast_description": "Développeur français en freelance",
         "home_button": "Go to home",

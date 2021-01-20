@@ -2,7 +2,6 @@ const cacheName = 'pwa-conf-v1';
 const staticAssets = [
   './',
   './index.html',
-  './fontawesome.js',
   './utils.js',
   './build',
   './images'
@@ -32,5 +31,5 @@ self.addEventListener('install', async event => {
 });
 
 self.addEventListener('fetch', event => {
-  event.respondWith(networkFirst(event.request));
+  event.respondWith(cacheFirst(event.request));
 });
