@@ -1,5 +1,6 @@
 <script>
 
+    import { Route } from 'tinro';
     import Sidebar from './components/Sidebar.svelte';
     import Home from './pages/Home.svelte';
     import Me from './pages/Me.svelte';
@@ -16,6 +17,10 @@
     .big-padding {
         padding: 0 9rem;
     }
+    .min-height {
+        min-height: 100vh;
+        min-width: 100vw;
+    }
 </style>
 
 <Options />
@@ -24,41 +29,41 @@
     <div class="column is-1 is-secondary-bg is-sidebar is-hidden-mobile">
         <Sidebar />
     </div>
-    <div>
+    <div class="min-height">
         <div class="column is-primary-bg is-hidden-touch big-padding">
-            <div id="home">
+            <Route path="/">
                 <Home />
-            </div>
-            <div id="me">
+            </Route>
+            <Route path="/me">
                 <Me />
-            </div>
-            <div id="projects">
+            </Route>
+            <Route path="/projects">
                 <Projects />
-            </div>
-            <div id="comissions_and_donations">
+            </Route>
+            <Route path="/comissions_and_donations">
                 <Comissions />
-            </div>
-            <div id="contact">
+            </Route>
+            <Route path="/contact">
                 <Contact />
-            </div>
+            </Route>
             <Footer />
         </div>
         <div class="column is-primary-bg is-hidden-desktop">
-            <div id="home">
+            <Route path="/">
                 <Home />
-            </div>
-            <div id="me">
+            </Route>
+            <Route path="/me">
                 <Me />
-            </div>
-            <div id="projects">
+            </Route>
+            <Route path="/projects">
                 <Projects />
-            </div>
-            <div id="comissions_and_donations">
+            </Route>
+            <Route path="/comissions_and_donations">
                 <Comissions />
-            </div>
-            <div id="contact">
+            </Route>
+            <Route path="/contact">
                 <Contact />
-            </div>
+            </Route>
             <Footer />
         </div>
     </div>

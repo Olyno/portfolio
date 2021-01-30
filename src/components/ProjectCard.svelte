@@ -1,7 +1,6 @@
 <script>
 
-    import { onMount } from 'svelte';
-    import { translations as _ } from '../stores';
+    import { translations as _, defaultLanguage } from '../stores';
 
     export let project;
 
@@ -43,9 +42,12 @@
                 <a aria-label="{$_.links.project}" class="title is-4 is-secondary isHoveringTitle" href="{project.html_url}">
                     {project.name}
                 </a>
+                <i>{project.language}</i>
             </div>
         </div>
         <div class="content">
+            <i>{$_.projects.since} {new Date(project.created_at).toLocaleDateString(defaultLanguage.toLowerCase() + '-' + defaultLanguage.toUpperCase())}</i>
+            <br /><br />
             <p>{project.description}</p>
         </div>
     </div>

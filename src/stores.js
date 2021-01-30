@@ -5,7 +5,7 @@ import { writable } from 'svelte/store';
 import englishLanguage from '../public/locale/en.json';
 import frenchLanguage from '../public/locale/fr.json';
 
-let defaultLanguage = window.navigator.languages ? window.navigator.languages[0] : null;
+export let defaultLanguage = window.navigator.languages ? window.navigator.languages[0] : null;
 defaultLanguage = window.localStorage.getItem('language')
     || defaultLanguage
     || window.navigator.language

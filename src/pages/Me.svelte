@@ -33,7 +33,7 @@
                                 {:else}
                                     <img class="stack-icon lazyload"
                                         data-sizes="auto"
-                                        data-src="{window.location.pathname}{stack.image}"
+                                        data-src="/{stack.image}"
                                         alt="Stack Icon">
                                 {/if}
                             </div>

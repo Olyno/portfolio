@@ -35,13 +35,13 @@
             <h1 class="subtitle is-secondary" data-aos="fade-left" data-aos-duration="2000">{$_.about_me.fast_description}</h1>
             <div class="level">
                 <div class="level-left">
-                    <a aria-label="{$_.contact.title}" href="#contact"
+                    <a aria-label="{$_.contact.title}" href="/contact"
                         class="button is-secondary-bg level-item"
                         data-aos="fade-left"
                         data-aos-duration="2000"
                        >{$_.contact.title}</a>
                     <a aria-label="{$_.about_me.button}" class:is-hidden={!shouldScroll}
-                        href="#me"
+                        href="/me"
                         data-aos="fade-left"
                         data-aos-duration="2000"
                         class="scrollButton level-item"

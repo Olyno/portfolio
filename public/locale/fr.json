@@ -18,7 +18,8 @@
         "title": "Mes projects",
         "loading": "Chargement des projets...",
         "see_more": "Voir plus de projets",
-        "button": "Aller à mes projets"
+        "button": "Aller à mes projets",
+        "since": "Depuis le"
     },
     "comissions": {
         "title": "Comissions et Donations",

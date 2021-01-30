@@ -19,7 +19,8 @@
         "title": "My Projects",
         "loading": "Loading projects...",
         "see_more": "See more projects",
-        "button": "Go to my projects"
+        "button": "Go to my projects",
+        "since": "Depuis"
     },
     "comissions": {
         "title": "Comissions and Donations",

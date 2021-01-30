@@ -31,5 +31,9 @@ self.addEventListener('install', async event => {
 });
 
 self.addEventListener('fetch', event => {
-  event.respondWith(cacheFirst(event.request));
+  if (window.location.pathname.includes('localhost')) {
+    event.respondWith(networkFirst(event.request));
+  } else {
+    event.respondWith(cacheFirst(event.request));
+  }
 });

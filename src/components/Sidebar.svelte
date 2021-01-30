@@ -34,27 +34,27 @@
 
 <div class="sidebar-content">
     <div class="sidebar-link">
-        <a aria-label="{$_.about_me.home_button}" href="#home">
+        <a aria-label="{$_.about_me.home_button}" href="/">
             <i class="sidebar-icon is-primary fas fa-home"></i>
         </a>
     </div>
     <div class="sidebar-link">
-        <a aria-label="{$_.about_me.button}" href="#me">
+        <a aria-label="{$_.about_me.button}" href="/me">
             <i class="sidebar-icon is-primary fas fa-user"></i>
         </a>
     </div>
     <div class="sidebar-link">
-        <a aria-label="{$_.projects.button}" href="#projects">
+        <a aria-label="{$_.projects.button}" href="/projects">
             <i class="sidebar-icon is-primary fas fa-folder"></i>
         </a>
     </div>
     <div class="sidebar-link">
-        <a aria-label="{$_.comissions.button}" href="#comissions_and_donations">
+        <a aria-label="{$_.comissions.button}" href="/comissions_and_donations">
             <i class="sidebar-icon is-primary fas fa-hand-holding-usd"></i>
         </a>
     </div>
     <div class="sidebar-link">
-        <a aria-label="{$_.contact.button}" href="#contact">
+        <a aria-label="{$_.contact.button}" href="/contact">
             <i class="sidebar-icon is-primary fas fa-phone"></i>
         </a>
     </div>
