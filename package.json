@@ -26,7 +26,7 @@
     "rollup-plugin-terser": "^7.0.2",
     "sharp": "^0.30.5",
     "stylus": "^0.54.8",
-    "svelte": "^3.31.2"
+    "svelte": "^3.49.0"
   },
   "dependencies": {
     "aos": "^3.0.0-beta.6",
