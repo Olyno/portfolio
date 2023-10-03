@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<title>Olyno | Portfolio</title>
+		<meta name="description" content="Personnal Portfolio of Olyno" />
+		<meta name="theme-color" content="#113946" />
+		<meta property="og:title" content="Olyno Portfolio" />
+		<meta property="og:url" content="https://olyno.dev" />
+		<meta property="og:description" content="My personnal portfolio." />
+		<meta property="og:image" content="/images/icons-pwa/icon-152x152.webp" />
+		<meta property="og:site_name" content="Olyno Portfolio" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+		<meta name="apple-mobile-web-app-title" content="Olyno Portfolio" />
+		<link rel="apple-touch-icon" href="/images/icons-pwa/icon-152x152.webp" />
+		<link rel="manifest" href="/manifest.json" />
+		<link rel="icon" type="image/png" href="/images/icons-pwa/icon-152x152.webp" />
+		<script async defer src="/serviceWorker.js"></script>
+		<script async defer src="/utils.js"></script>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap"
+			rel="stylesheet"
+		/>
+		%sveltekit.head%
+	</head>
+	<body data-sveltekit-preload-data="hover" class="bg-background text-primary font-sans">
+		<div style="display: contents">%sveltekit.body%</div>
+	</body>
+</html>

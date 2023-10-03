@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+	scroll-behavior: smooth;
+}
+
+.scrollButton {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 35px;
+	height: 55px;
+	border-radius: 25px;
+	position: relative;
+	@apply border-primary border-2 border-solid;
+}
+
+.scrollButton span {
+	display: block;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	position: absolute;
+	top: 15px;
+	left: calc(50% - 4px);
+	animation: scroll 1.5s infinite;
+	@apply bg-primary;
+}
+
+@keyframes scroll {
+	0%,
+	20%,
+	100% {
+		transform: translateY(0);
+	}
+	40% {
+		transform: translateY(15px);
+	}
+	60% {
+		transform: translateY(15px);
+	}
+	80% {
+		transform: translateY(0);
+	}
+}

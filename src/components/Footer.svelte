@@ -1,19 +1,32 @@
-<style>
-    footer {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        bottom: 0;
-    }
-    footer p {
-        margin-top: 100px;
-        font-size: 16px;
-    }
-</style>
+<script lang="ts">
+	import LL from '$i18n/i18n-svelte';
+</script>
 
-<footer data-aos="flip-left" data-aos-duration="2000">
-    <p class="is-secondary">
-        <a aria-label="Copyright - Olyno 2020" class="is-secondary" href="https://github.com/Olyno" target="_blank" rel="noreferrer">Olyno</a> 
-        <i class="is-secondary fas fa-copyright"></i> 2020
-    </p>
+<footer class="w-full bg-highlight text-primary py-6 px-8">
+	<div class="text-center">
+		<p>
+			&copy; 2023 Olyno. {@html $LL.footer
+				.content()
+				.replaceAll(
+					'GitHub',
+					`<a
+						href="https://github.com/Olyno"
+						target="_blank"
+						class="text-secondary hover:text-background transition-colors duration-300"
+					>
+						GitHub
+					</a>`
+				)
+				.replaceAll(
+					'Twitter',
+					`<a
+						href="https://twitter.com/OlynoWorker"
+						target="_blank"
+						class="text-secondary hover:text-background transition-colors duration-300"
+					>
+						Twitter
+					</a>`
+				)}
+		</p>
+	</div>
 </footer>
