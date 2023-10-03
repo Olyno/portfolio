@@ -6,7 +6,8 @@ import 'lazysizes';
 import { get } from 'svelte/store';
 import '../app.css';
 
-export let ssr = false;
+export const ssr = false;
+export const prerender = true;
 
 export async function load() {
 	await loadLocaleAsync(get(locale) || 'en');
