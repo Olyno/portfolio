@@ -18,7 +18,7 @@
 		"@sveltejs/kit": "^1.20.4",
 		"@types/aos": "^3.0.5",
 		"autoprefixer": "^10.4.16",
-		"postcss": "^8.4.31",
+		"postcss": "^8.5.10",
 		"prettier": "^2.8.0",
 		"prettier-plugin-svelte": "^2.10.1",
 		"svelte": "^4.2.19",
