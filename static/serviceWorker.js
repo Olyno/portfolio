@@ -1,4 +1,4 @@
-const cacheName = 'olyno-portfolio-v3';
+const cacheName = 'olyno-portfolio-v4';
 
 self.addEventListener('install', () => {
 	self.skipWaiting();
