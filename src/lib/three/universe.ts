@@ -80,7 +80,6 @@ export class Universe {
 	private disposed = false;
 
 	private stars: THREE.Points | null = null;
-	private nebulae: THREE.Sprite[] = [];
 	private shooters: THREE.Points | null = null;
 	private orbMesh: THREE.InstancedMesh | null = null;
 	private orbGlow: THREE.Points | null = null;
@@ -120,7 +119,6 @@ export class Universe {
 		this.posCurve = curves[0];
 		this.lookCurve = curves[1];
 		this.buildStars();
-		this.buildNebulae();
 		this.buildTerrain();
 		this.buildContact();
 		if (quality === 'high') this.buildShooters();
@@ -138,8 +136,8 @@ export class Universe {
 			[
 				new THREE.Vector3(0, 0, HERO_Z + 6),
 				new THREE.Vector3(0, 0, HERO_Z - 6),
-				new THREE.Vector3(0, 2.5, ORB_Z + 18),
-				new THREE.Vector3(0, 1.5, ORB_Z + 2),
+				new THREE.Vector3(0, 17, ORB_Z + 24),
+				new THREE.Vector3(0, 15, ORB_Z - 2),
 				new THREE.Vector3(0, 15, TERRAIN_Z + 24),
 				new THREE.Vector3(0, 9, TERRAIN_Z - 4),
 				new THREE.Vector3(0, 2.2, CONTACT_Z + 18),
@@ -153,8 +151,8 @@ export class Universe {
 			[
 				new THREE.Vector3(0, 0, HERO_Z - 20),
 				new THREE.Vector3(0, 0, HERO_Z - 40),
-				new THREE.Vector3(0, 2, ORB_Z - 6),
-				new THREE.Vector3(0, 1, ORB_Z - 14),
+				new THREE.Vector3(0, 3, ORB_Z + 2),
+				new THREE.Vector3(0, 2, ORB_Z - 10),
 				new THREE.Vector3(0, 0, TERRAIN_Z + 4),
 				new THREE.Vector3(0, 0, TERRAIN_Z - 26),
 				new THREE.Vector3(0, 3, CONTACT_Z - 4),
@@ -218,9 +216,9 @@ export class Universe {
 					vColor = aColor;
 					vTw = 0.6 + 0.4 * sin(uTime * (0.6 + fract(aSeed) * 1.4) + aSeed * 9.0);
 					vec4 mv = modelViewMatrix * vec4(position, 1.0);
-					float near = smoothstep(5.0, 22.0, -mv.z);
+					float near = smoothstep(10.0, 26.0, -mv.z);
 					vTw = vTw * near;
-					gl_PointSize = min(aSize * uPix * (30.0 / -mv.z), 9.0 * uPix);
+					gl_PointSize = min(aSize * uPix * (26.0 / -mv.z), 7.0 * uPix);
 					gl_Position = projectionMatrix * mv;
 				}`,
 			fragmentShader: /* glsl */ `
@@ -236,37 +234,13 @@ export class Universe {
 		this.scene.add(this.stars);
 	}
 
-	private buildNebulae() {
-		const tex = radialSprite('rgba(255,255,255,.85)', 'rgba(255,255,255,.18)');
-		const spots: [number, number, number, number, THREE.Color][] = [
-			[-26, 10, ORB_Z + 26, 46, new THREE.Color('#0e2e36')],
-			[30, -12, ORB_Z - 12, 52, new THREE.Color('#2c2109')],
-			[-18, 14, TERRAIN_Z + 26, 56, new THREE.Color('#0a222b')],
-			[24, 12, CONTACT_Z + 20, 40, new THREE.Color('#33260b')]
-		];
-		for (const [x, y, z, s, c] of spots) {
-			const m = new THREE.SpriteMaterial({
-				map: tex,
-				color: c,
-				transparent: true,
-				opacity: 0.24,
-				blending: THREE.AdditiveBlending,
-				depthWrite: false
-			});
-			const sp = new THREE.Sprite(m);
-			sp.position.set(x, y, z);
-			sp.scale.setScalar(s);
-			this.nebulae.push(sp);
-			this.scene.add(sp);
-		}
-	}
-
 	private buildShooters() {
 		const geo = new THREE.BufferGeometry();
 		geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(3), 3));
 		const mat = new THREE.PointsMaterial({
 			map: radialSprite('rgba(255,240,200,1)', 'rgba(255,220,140,.4)'),
-			size: 1.4,
+			size: 3.2,
+			sizeAttenuation: false,
 			transparent: true,
 			opacity: 0,
 			blending: THREE.AdditiveBlending,
@@ -308,13 +282,18 @@ export class Universe {
 
 		// instanced orbs — size by star count
 		const geo = new THREE.IcosahedronGeometry(1, this.quality === 'high' ? 2 : 1);
-		const mat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.95 });
+		const mat = new THREE.MeshBasicMaterial({
+			color: '#2b3540',
+			transparent: true,
+			opacity: 0.5
+		});
 		const orbMesh = new THREE.InstancedMesh(geo, mat, this.orbs.length);
 		this.orbMesh = orbMesh;
 		const m = new THREE.Matrix4();
-		const base = new THREE.Color('#cfc7b2');
+		// small dark nodes — the visible "star" is the capped glow halo; the mesh
+		// only exists as a raycast hover target, so it can never balloon up close
 		this.orbs.forEach((o, i) => {
-			const s = 0.22 + Math.pow(Math.max(o.stars, 0.35), 0.5) * 0.2;
+			const s = 0.14 + Math.pow(Math.max(o.stars, 0.35), 0.5) * 0.05;
 			m.makeScale(s, s, s).setPosition(o.x, o.y, o.z);
 			orbMesh.setMatrixAt(i, m);
 		});
@@ -326,6 +305,7 @@ export class Universe {
 		const gPos = new Float32Array(this.orbs.length * 3);
 		const gSize = new Float32Array(this.orbs.length);
 		const gCol = new Float32Array(this.orbs.length * 3);
+		const base = new THREE.Color('#cfc7b2');
 		this.orbs.forEach((o, i) => {
 			gPos[i * 3] = o.x;
 			gPos[i * 3 + 1] = o.y;
@@ -358,10 +338,10 @@ export class Universe {
 				void main() {
 					vColor = aColor;
 					vec4 mv = modelViewMatrix * vec4(position, 1.0);
-					vA = smoothstep(16.0, 42.0, -mv.z);
-					float near = smoothstep(0.0, 12.0, -mv.z);
+					// fully invisible until 30 units out — nothing balloons near the camera
+					vA = smoothstep(30.0, 55.0, -mv.z);
 					float pulse = 1.0 + 0.18 * sin(uTime * 1.7 + position.x * 2.0 + position.y);
-					gl_PointSize = min(aSize * pulse * uPix * (120.0 / -mv.z), 40.0 * uPix) * (0.15 + 0.85 * near);
+					gl_PointSize = min(aSize * pulse * uPix * (60.0 / -mv.z), 6.0 * uPix);
 					gl_Position = projectionMatrix * mv;
 				}`,
 			fragmentShader: /* glsl */ `
@@ -370,7 +350,7 @@ export class Universe {
 				varying float vA;
 				void main() {
 					vec4 t = texture2D(uTex, gl_PointCoord);
-					gl_FragColor = vec4(vColor, t.a * 0.42 * vA);
+					gl_FragColor = vec4(vColor, t.a * 0.35 * vA);
 				}`
 		});
 		this.orbGlow = new THREE.Points(gGeo, gMat);
@@ -602,10 +582,6 @@ export class Universe {
 		if (this.ring) {
 			this.ring.rotation.x = Math.sin(t * 0.25) * 0.25 + 0.35;
 			this.ring.rotation.y = t * 0.12;
-		}
-		for (let i = 0; i < this.nebulae.length; i++) {
-			const n = this.nebulae[i];
-			n.material.opacity = 0.18 + 0.07 * Math.sin(t * 0.22 + i * 1.7);
 		}
 
 		// shooting stars over the hero

@@ -119,7 +119,7 @@
 				loading="lazy"
 			/>
 			<div
-				class="pointer-events-none absolute inset-0 bg-gradient-to-r from-ink via-ink/85 to-ink/30"
+				class="pointer-events-none absolute inset-0 bg-gradient-to-r from-ink via-ink/80 to-ink/30"
 			></div>
 			<div class="relative grid gap-6 p-6 sm:p-9 lg:grid-cols-[1.4fr_1fr] lg:items-center">
 				<div>
