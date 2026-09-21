@@ -26,18 +26,20 @@
 
 	--breakpoint-plate: 68rem;
 
+	--container-shell: 78rem;
+
 	/* v4 keeps my custom utilities honest — no more 3.4 gaps */
 }
 
 /* theme values ----------------------------------------------------- */
 :root,
 html[data-theme='light'] {
-	--plate: #f2ead8; /* paper */
-	--panel: #f8f2e4; /* raised card */
+	--plate: #f6efdf; /* paper */
+	--panel: #fcf8ec; /* raised card */
 	--line: #d8cbb0;
 	--line-soft: #e6dcc6;
-	--tx: #1e1b14;
-	--tx-dim: #57503f;
+	--tx: #17140d;
+	--tx-dim: #463f2e;
 	--tx-faint: #6f6754;
 	--brass: #9a7422;
 	--brass-deep: #7c5c17;
@@ -50,20 +52,20 @@ html[data-theme='light'] {
 }
 
 html[data-theme='dark'] {
-	--plate: #0c0f14;
-	--panel: #131820;
-	--line: #2a3240;
-	--line-soft: #1c232e;
-	--tx: #e9e4d6;
-	--tx-dim: #9aa1ac;
-	--tx-faint: #7d8490;
-	--brass: #d9a441;
-	--brass-deep: #b98a2c;
-	--ember: #e07a53;
-	--verify: #4cc38a;
-	--scene-0: #0c0f14;
-	--scene-1: #e9e4d6;
-	--scene-2: #d9a441;
+	--plate: #07090d;
+	--panel: #10151e;
+	--line: #2c3648;
+	--line-soft: #1b2330;
+	--tx: #f2edde;
+	--tx-dim: #aeb6c4;
+	--tx-faint: #8a93a3;
+	--brass: #e3b44e;
+	--brass-deep: #c2932f;
+	--ember: #ef8a62;
+	--verify: #55d199;
+	--scene-0: #07090d;
+	--scene-1: #f2edde;
+	--scene-2: #e3b44e;
 	color-scheme: dark;
 }
 

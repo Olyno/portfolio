@@ -93,5 +93,6 @@
 	"projects_kicker": "the specimens",
 	"projects_oss_more": "open-source, archived & misc",
 	"contact_email_hint": "hidden on purpose — click to reveal, then copy",
-	"a11y_theme": "Toggle light and dark"
+	"a11y_theme": "Toggle light and dark",
+	"hero_portrait_caption": "the face behind the commits"
 }
