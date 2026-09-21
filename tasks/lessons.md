@@ -1,0 +1,26 @@
+# Lessons
+
+## 2026-09-21 — portfolio rebuild
+
+- **i18n default is Paraglide**, not typesafe-i18n, for all new work (reference setup:
+  `kimi-code-improved/patchbay/patchbay-ee` — `project.inlang/settings.json` copied verbatim,
+  flat-key `messages/{en,fr}.json`, `@inlang/paraglide-js` vite plugin, generated `src/lib/paraglide`
+  is gitignored and excluded from svelte-check).
+- **Custom domain reality**: `olyno.dev` is fronted by a **Vercel project** (x-vercel-cache header).
+  The GH Actions workflow only publishes `gh-pages`. After pushing, `gh-pages` is new but the live
+  domain served a 16-day-old cache — a Vercel redeploy/cache-refresh is required from Olyno's
+  Vercel dashboard (no CLI/token available in this environment).
+- **Tailwind is pinned to 3.3**: `min-h-14`, `min-h-44`, `min-w-56` (3.4 spacing-scale names) silently
+  emit no CSS. Use arbitrary values (`min-h-[3.5rem]`) or bump Tailwind to 3.4+.
+- **Svelte 5 runes**: never name a local `state` (collides with the `$state` rune → "Cannot use
+  'state' as a store" / TDZ errors). Message catalogs `m.*()` are non-reactive reads — key the UI on
+  a `localeVersion` store (`{#key}`) for live language switching without reload.
+- **three.js additive point systems need a distance-fade in the vertex shader**
+  (`smoothstep(near,far,-mv.z)` + hard `gl_PointSize` cap), otherwise points balloon into white
+  balls as the camera flies through them. Sprites (nebulae) can't be capped per-screen — removed.
+- **Headless browser QA trap**: a running `vite preview` serves a snapshot of `build/` — after
+  rebuilds, **restart the preview server** and unregister the PWA service worker before trusting
+  screenshots; stale bundles caused an entire false-positive bug hunt.
+- **`edit` tool**: anchored edits need a fresh `read` of the exact region; tags from earlier in a
+  long session silently corrupt files (happened 4×). Full `write` rewrites are safer for components
+  that changed repeatedly.
