@@ -1,23 +1,23 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
-		<title>Olyno — Idea starter, open-source builder & full-stack developer</title>
+		<title>Olyno — Entrepreneur, full-stack developer, idea starter</title>
 		<meta
 			name="description"
-			content="Portfolio of Olyno: full-stack developer, content manager and open-source enthusiast. PatchBay, Mod A Duck, Impeccable and a universe of shipped side-projects — live from GitHub."
+			content="Field survey of Olyno: entrepreneur and full-stack developer, idea starter and open-source enthusiast. Every repository, contribution and side-project — plotted live from GitHub."
 		/>
 		<meta name="author" content="Olyno" />
-		<meta name="theme-color" content="#07080A" />
-		<meta name="color-scheme" content="dark" />
+		<meta name="theme-color" content="#f2ead8" media="(prefers-color-scheme: light)" />
+		<meta name="theme-color" content="#0c0f14" media="(prefers-color-scheme: dark)" />
 		<meta property="og:type" content="website" />
 		<meta property="og:site_name" content="Olyno" />
-		<meta property="og:title" content="Olyno — Idea starter & open-source enthusiast" />
+		<meta property="og:title" content="Olyno — field survey of an idea starter" />
 		<meta
 			property="og:description"
-			content="Full-stack developer, content manager and open-source enthusiast. Explore every project, live-synced from GitHub."
+			content="Entrepreneur & full-stack developer. Builder of PatchBay and Mod A Duck. Every project, plotted live from GitHub."
 		/>
 		<meta property="og:url" content="https://olyno.dev" />
 		<meta property="og:image" content="https://olyno.dev/images/brand/og-image.jpg" />
@@ -26,10 +26,10 @@
 		<meta name="twitter:card" content="summary_large_image" />
 		<meta name="twitter:site" content="@Olyno_" />
 		<meta name="twitter:creator" content="@Olyno_" />
-		<meta name="twitter:title" content="Olyno — Idea starter & open-source enthusiast" />
+		<meta name="twitter:title" content="Olyno — field survey of an idea starter" />
 		<meta
 			name="twitter:description"
-			content="Full-stack developer, content manager and open-source enthusiast. Explore every project, live-synced from GitHub."
+			content="Entrepreneur & full-stack developer. Builder of PatchBay and Mod A Duck. Every project, plotted live from GitHub."
 		/>
 		<meta name="twitter:image" content="https://olyno.dev/images/brand/og-image.jpg" />
 		<link rel="apple-touch-icon" href="/images/icons-pwa/icon-152x152.png" />
@@ -38,39 +38,53 @@
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
-			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
+			href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap"
 			rel="stylesheet"
 		/>
+		<script>
+			// pre-paint theme (no flash): stored choice, else system preference
+			(function () {
+				try {
+					var t = localStorage.getItem('olyno-theme');
+					if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+					document.documentElement.dataset.theme = t;
+					document.documentElement.style.colorScheme = t;
+				} catch (e) {
+					/* private mode — light stays */
+				}
+			})();
+		</script>
 		<script async defer src="/serviceWorker.js"></script>
 		<script async defer src="/utils.js"></script>
 		%sveltekit.head%
 	</head>
-	<body data-sveltekit-preload-data="hover" class="bg-ink text-cream font-sans antialiased">
+	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>
 		<noscript>
 			<div
 				style="
 					position: fixed;
 					inset: 0;
-					background: #07080a;
-					color: #f6f1e3;
+					background: #f2ead8;
+					color: #1e1b14;
 					display: flex;
 					flex-direction: column;
 					align-items: center;
 					justify-content: center;
 					gap: 1rem;
-					font-family: Inter, sans-serif;
+					font-family: sans-serif;
 					text-align: center;
 					padding: 2rem;
 					z-index: 99;
 				"
 			>
 				<h1 style="font-size: 2rem">Hi, I'm Olyno</h1>
-				<p>Idea starter & open-source enthusiast · Full-Stack Developer · France</p>
+				<p>Idea starter & open-source enthusiast · Entrepreneur · Full-stack developer · France</p>
 				<p>
 					Projects:
-					<a style="color: #e7b84f" href="https://github.com/Olyno">github.com/Olyno</a> ·
-					<a style="color: #e7b84f" href="https://x.com/Olyno_">x.com/Olyno_</a>
+					<a style="color: #9a7422" href="https://github.com/Olyno">github.com/Olyno</a> ·
+					<a style="color: #9a7422" href="https://x.com/Olyno_">x.com/Olyno_</a> ·
+					<a style="color: #9a7422" href="https://github.com/Olyno/patchbay">PatchBay</a>
 				</p>
 			</div>
 		</noscript>

@@ -1,15 +1,14 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { LINKS } from '$lib/links';
-	import { ICONS } from '$lib/icons';
 	import { magnetic } from '$lib/attach';
 	import { gh, totalContribs } from '$lib/github';
 	import { m } from '$lib/paraglide/messages.js';
 	import { localeVersion } from '$lib/locale';
 
-	const ghState = $derived($gh);
+	const st = $derived($gh);
+	const lang = $derived($localeVersion);
 
-	// `void $localeVersion` re-runs the derivation on language switch
 	const roles = $derived.by(() => {
 		void $localeVersion;
 		return [
@@ -25,7 +24,6 @@
 		void $localeVersion;
 		return `${m.hero_title_a()} ${m.hero_title_b()}`.split(' ');
 	});
-	const lang = $derived($localeVersion);
 
 	let typed = $state('');
 	let caret = $state(true);
@@ -37,24 +35,24 @@
 		}
 		let idx = 0;
 		let n = 0;
-		let deleting = false;
+		let del = false;
 		let timer: ReturnType<typeof setTimeout>;
 		const step = () => {
 			const target = roles[idx];
-			if (!deleting) {
+			if (!del) {
 				n++;
 				typed = target.slice(0, n);
 				if (n >= target.length) {
-					deleting = true;
+					del = true;
 					timer = setTimeout(step, 2200);
 					return;
 				}
-				timer = setTimeout(step, 40 + Math.random() * 42);
+				timer = setTimeout(step, 38 + Math.random() * 40);
 			} else {
 				n--;
 				typed = target.slice(0, n);
 				if (n <= 0) {
-					deleting = false;
+					del = false;
 					idx = (idx + 1) % roles.length;
 					timer = setTimeout(step, 380);
 					return;
@@ -70,135 +68,186 @@
 		};
 	});
 
-	const since = $derived(new Date(ghState.user?.created_at ?? 0).getUTCFullYear() || 2017);
+	const since = $derived(new Date(st.user?.created_at ?? 0).getUTCFullYear() || 2017);
 
-	function spotlight(e: PointerEvent) {
-		const s = document.documentElement.style;
-		s.setProperty('--spot-x', e.clientX + 'px');
-		s.setProperty('--spot-y', e.clientY + 'px');
-	}
+	// banner parallax (drives via CSS var, no per-frame style thrash)
+	let bannerWrap: HTMLDivElement | undefined = $state();
+	onMount(() => {
+		if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+		let raf = 0;
+		let ticking = false;
+		const onScroll = () => {
+			if (ticking) return;
+			ticking = true;
+			raf = requestAnimationFrame(() => {
+				ticking = false;
+				if (bannerWrap && scrollY < innerHeight * 1.5) {
+					bannerWrap.style.setProperty('--sy', String(scrollY));
+				}
+			});
+		};
+		addEventListener('scroll', onScroll, { passive: true });
+		return () => {
+			removeEventListener('scroll', onScroll);
+			cancelAnimationFrame(raf);
+		};
+	});
 </script>
 
-<svelte:window onpointermove={spotlight} />
+<svelte:head>
+	<title>Olyno — Entrepreneur, full-stack developer, idea starter</title>
+</svelte:head>
 
-<section
-	id="home"
-	class="relative flex min-h-[100svh] scroll-mt-20 flex-col items-center justify-center px-5"
->
-	<div class="mx-auto w-full max-w-shell pb-16 pt-28 text-center">
-		<p class="mono-label mb-6 inline-flex items-center gap-2 text-gold/90">
-			<span class="relative flex h-2 w-2">
-				<span
-					class="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold opacity-60"
-				></span>
-				<span class="relative inline-flex h-2 w-2 rounded-full bg-gold"></span>
-			</span>
-			{m.hero_kicker()}
-		</p>
+<section id="home" class="relative min-h-[100svh]">
+	<!-- exhibition plate: the banner is the artwork, framed like a gallery piece -->
+	<div
+		class="plate-wrap absolute inset-0 overflow-hidden"
+		bind:this={bannerWrap}
+		style="transform: translate3d(calc(var(--sy,0) * -0.18px), 0, 0) scale(1.08)"
+	>
+		<img
+			src="/images/brand/banner.webp"
+			alt={m.hero_banner_alt()}
+			class="banner-img h-full w-full object-cover"
+			fetchpriority="high"
+		/>
+		<div class="veil"></div>
+	</div>
 
-		<h1 class="display mx-auto max-w-5xl text-[clamp(2.2rem,6.6vw,4.6rem)]">
-			{#each titleWords as w, i (`${lang}-${w}-${i}`)}
-				<span class="word"
-					><span class="word-in" style:animation-delay={`${0.25 + i * 0.12}s`}>{w}</span></span
-				>
-			{/each}
-			<span class="word"
-				><span
-					class="word-in brass-text"
-					style:animation-delay={`${0.25 + titleWords.length * 0.12}s`}>.</span
-				></span
-			>
-		</h1>
-
-		<p
-			class="mx-auto mt-6 flex min-h-[3.5rem] max-w-xl items-start justify-center gap-x-2 font-mono text-sm leading-7 text-cream-dim sm:text-base"
-		>
-			<span class="shrink-0 text-cream-faint">{m.hero_role_prefix()}&nbsp;</span>
-			<span class="text-left text-teal"
-				>{typed}<span class="text-gold" class:opacity-0={!caret}>▍</span></span
-			>
-		</p>
-
-		<div class="mt-10 flex flex-wrap items-center justify-center gap-4">
-			<a href="#projects" class="btn btn-solid" {@attach magnetic(0.2)} data-cursor>
-				{m.hero_cta_projects()}
-				<svg
-					width="16"
-					height="16"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2.4"
-					stroke-linecap="round"
-					stroke-linejoin="round"><path d={ICONS.arrow}></path></svg
-				>
-			</a>
-			<a href="#contact" class="btn btn-ghost" {@attach magnetic(0.16)} data-cursor>
-				{m.hero_cta_contact()}
-			</a>
-			<a
-				href={LINKS.x}
-				target="_blank"
-				rel="noopener noreferrer"
-				class="btn btn-ghost !px-4"
-				aria-label={m.hero_x_handle()}
-				data-cursor
-			>
-				<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"
-					><path d={ICONS.x}></path></svg
-				>
-				@Olyno_
-			</a>
-		</div>
-
-		<dl
-			class="mx-auto mt-14 grid max-w-2xl grid-cols-3 gap-px overflow-hidden rounded-2xl border border-ink-line bg-ink-line"
-		>
-			<div class="bg-ink-soft/80 px-3 py-5 backdrop-blur">
-				<dd class="font-display text-2xl font-extrabold text-cream sm:text-3xl">
-					{ghState.user?.public_repos ?? 169}
-				</dd>
-				<dt class="mono-label mt-1 text-cream-faint">{m.hero_meta_repos()}</dt>
-			</div>
-			<div class="bg-ink-soft/80 px-3 py-5 backdrop-blur">
-				<dd class="font-display text-2xl font-extrabold text-gold sm:text-3xl">
-					{totalContribs.toLocaleString('en')}
-				</dd>
-				<dt class="mono-label mt-1 text-cream-faint">{m.hero_meta_contribs()}</dt>
-			</div>
-			<div class="bg-ink-soft/80 px-3 py-5 backdrop-blur">
-				<dd class="font-display text-2xl font-extrabold text-cream sm:text-3xl">{since}</dd>
-				<dt class="mono-label mt-1 text-cream-faint">{m.hero_meta_since()}</dt>
-			</div>
-		</dl>
-
-		<div class="mt-16 flex justify-center">
-			<a aria-label={m.hero_scroll()} href="#about" class="scrollButton" data-cursor>
-				<span></span>
-			</a>
+	<!-- the engraving: avatar in a hairline ring, top-left of the plate -->
+	<div
+		class="absolute left-1/2 top-24 z-10 -translate-x-1/2 sm:left-8 sm:top-auto sm:translate-x-0 lg:top-40"
+	>
+		<div class="avatar-ring">
+			<img
+				src="/images/brand/avatar-192.webp"
+				alt="Olyno"
+				width="72"
+				height="72"
+				class="h-[72px] w-[72px] rounded-full object-cover"
+			/>
 		</div>
 	</div>
+
+	<div
+		class="relative z-10 mx-auto flex min-h-[100svh] max-w-shell flex-col justify-end px-5 pb-10 sm:pb-16"
+	>
+		<!-- editorial block bottom-left, like a wall label -->
+		<div class="max-w-2xl">
+			<p class="data-label mb-4 flex items-center gap-3">
+				<span class="brass-dot"></span>
+				{m.hero_kicker()}
+			</p>
+
+			<h1 class="serif text-[clamp(2.8rem,9vw,6.2rem)] text-[var(--tx)]">
+				<span class="block text-[0.34em] tracking-[0.01em]"
+					>{#each titleWords.slice(0, -1) as w, i (`${lang}-a-${w}-${i}`)}<span class="word"
+							><span class="word-in">{w}</span></span
+						>
+					{/each}</span
+				>
+				<span class="italic">{titleWords.at(-1)}</span><span class="text-[var(--brass)]">.</span>
+			</h1>
+
+			<p class="mt-4 font-mono text-sm text-[var(--tx-dim)] sm:text-base">
+				{m.hero_role_prefix()}&nbsp;<span class="text-[var(--brass)]">{typed}</span><span
+					class:opacity-0={!caret}>▍</span
+				>
+			</p>
+
+			<div class="mt-8 flex flex-wrap items-center gap-3">
+				<a href="#projects" class="btn btn-solid" {@attach magnetic(0.18)} data-cursor>
+					{m.hero_cta_projects()}
+				</a>
+				<a href="#contact" class="btn btn-ghost" {@attach magnetic(0.14)} data-cursor>
+					{m.hero_cta_contact()}
+				</a>
+				<a
+					href={LINKS.x}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="btn btn-ghost !px-3"
+					aria-label={m.hero_x_handle()}
+					data-cursor>X</a
+				>
+			</div>
+
+			<!-- wall-label stats: the exhibit's census -->
+			<dl class="mt-10 flex flex-wrap gap-x-10 gap-y-4 border-t border-[var(--line)] pt-5">
+				<div>
+					<dd class="serif text-2xl text-[var(--tx)]">{st.user?.public_repos ?? 169}</dd>
+					<dt class="data-label">{m.hero_meta_repos()}</dt>
+				</div>
+				<div>
+					<dd class="serif text-2xl text-[var(--brass)]">{totalContribs.toLocaleString('en')}</dd>
+					<dt class="data-label">{m.hero_meta_contribs()}</dt>
+				</div>
+				<div>
+					<dd class="serif text-2xl text-[var(--tx)]">{since}</dd>
+					<dt class="data-label">{m.hero_meta_since()}</dt>
+				</div>
+			</dl>
+		</div>
+	</div>
+
+	<a
+		aria-label={m.hero_scroll()}
+		href="#about"
+		class="scrollButton absolute bottom-6 left-1/2 hidden -translate-x-1/2 lg:flex"
+		data-cursor><span></span></a
+	>
 </section>
 
 <style>
-	.word-in {
-		display: inline-block;
-		margin-right: 0.22em;
-		opacity: 0;
-		transform: translateY(110%);
-		animation: word-up 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+	.plate-wrap {
+		will-change: transform;
 	}
-	@keyframes word-up {
+	.banner-img {
+		filter: saturate(0.92) contrast(1.02);
+	}
+	/* duotone veil: keeps the artwork visible but readable under text */
+	.veil {
+		position: absolute;
+		inset: 0;
+		background:
+			linear-gradient(
+				to top,
+				color-mix(in srgb, var(--plate) 88%, transparent) 0%,
+				color-mix(in srgb, var(--plate) 30%, transparent) 38%,
+				transparent 70%
+			),
+			radial-gradient(
+				120% 90% at 85% 10%,
+				transparent 30%,
+				color-mix(in srgb, var(--plate) 35%, transparent) 100%
+			);
+	}
+	.brass-dot {
+		width: 7px;
+		height: 7px;
+		border-radius: 50%;
+		background: var(--brass);
+		box-shadow: 0 0 0 4px color-mix(in srgb, var(--brass) 22%, transparent);
+	}
+	.avatar-ring {
+		position: relative;
+		display: inline-flex;
+		padding: 6px;
+		border-radius: 50%;
+		border: 1px solid var(--line);
+		background: color-mix(in srgb, var(--panel) 80%, transparent);
+	}
+	.avatar-ring::before {
+		content: '';
+		position: absolute;
+		inset: -7px;
+		border-radius: 50%;
+		border: 1px dashed color-mix(in srgb, var(--brass) 55%, transparent);
+		animation: spin 24s linear infinite;
+	}
+	@keyframes spin {
 		to {
-			opacity: 1;
-			transform: none;
-		}
-	}
-	@media (prefers-reduced-motion: reduce) {
-		.word-in {
-			opacity: 1;
-			transform: none;
-			animation: none;
+			transform: rotate(360deg);
 		}
 	}
 </style>

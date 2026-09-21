@@ -15,7 +15,7 @@ export interface CuratedProject {
 	gh?: string;
 	x?: string;
 	badge?: string;
-	hero?: { banner: string; icon: string; accent: string };
+	hero?: { banner: string; bannerLight?: string; icon: string; iconLight?: string; accent: string };
 	year: string;
 }
 
@@ -34,8 +34,10 @@ export const curated: CuratedProject[] = [
 		gh: 'patchbay',
 		badge: 'flagship',
 		hero: {
-			banner: '/images/brand/patchbay-banner.webp',
-			icon: '/images/brand/patchbay-icon.webp',
+			banner: '/images/brand/patchbay-banner-dark.webp',
+			bannerLight: '/images/brand/patchbay-banner-light.webp',
+			icon: '/images/brand/patchbay-icon-dark.webp',
+			iconLight: '/images/brand/patchbay-icon-light.webp',
 			accent: '#E0A83C'
 		},
 		year: '2026'
@@ -58,21 +60,6 @@ export const curated: CuratedProject[] = [
 			icon: '/images/brand/modaduck-icon.webp',
 			accent: '#8B5CF6'
 		},
-		year: '2026'
-	},
-	{
-		id: 'impeccable',
-		name: 'Impeccable',
-		tagline: 'The design language that makes your AI harness better at design',
-		description:
-			'Turn AI slop into interfaces you are proud to ship. Impeccable gives coding agents real design vocabulary — 40+ commands, a deterministic detector that runs in code without an API key, and human-reviewed design worlds.',
-		role: 'Contributor · design engineering',
-		status: 'live',
-		stack: ['Design systems', 'AI agents', 'DX'],
-		kind: 'product',
-		url: 'https://impeccable.style',
-		gh: 'impeccable',
-		badge: 'live',
 		year: '2026'
 	},
 	{

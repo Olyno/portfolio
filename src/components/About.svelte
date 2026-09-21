@@ -4,20 +4,28 @@
 	import { reveal, counter } from '$lib/attach';
 	import { gh, totalContribs, langStats } from '$lib/github';
 	import { m } from '$lib/paraglide/messages.js';
-	import { paletteOpen } from '$lib/palette';
+	import { localeVersion } from '$lib/locale';
 
-	const repos = $derived($gh.repos);
+	const st = $derived($gh);
 	const langs = $derived($langStats);
+	$localeVersion;
 
-	const stars = $derived(repos.reduce((a, r) => a + r.stars, 0));
-	const forks = $derived(repos.reduce((a, r) => a + r.forks, 0));
+	const stars = $derived(st.repos.reduce((a, r) => a + r.stars, 0));
+	const forks = $derived(st.repos.reduce((a, r) => a + r.forks, 0));
 
-	// top 7 languages for the donut ring, normalized to 100
+	// language instrument ring
 	const ring = $derived.by(() => {
-		const top = $langStats.slice(0, 7);
+		const top = $langStats.slice(0, 6);
 		const total = top.reduce((a, [, n]) => a + n, 0) || 1;
 		let acc = 0;
-		const palette = ['#e7b84f', '#2dd4bf', '#7c9cf5', '#f2d38a', '#8b5cf6', '#b98a2c', '#f6f1e3'];
+		const palette = [
+			'var(--brass)',
+			'var(--verify)',
+			'var(--ember)',
+			'#7c9cf5',
+			'var(--tx-dim)',
+			'var(--brass-deep)'
+		];
 		return top.map(([lang, n], i) => {
 			const seg = {
 				lang,
@@ -32,41 +40,48 @@
 	});
 
 	const stats = $derived([
-		{ v: $gh.user?.public_repos ?? 169, l: m.about_stats_repos(), gold: false },
-		{ v: totalContribs, l: m.about_stats_contribs(), gold: true },
-		{ v: stars, l: m.about_stats_stars(), gold: false },
-		{ v: forks, l: m.about_stats_forks(), gold: false },
-		{ v: $gh.user?.followers ?? 90, l: m.about_stats_followers(), gold: false },
-		{ v: langs.length, l: m.about_stats_langs(), gold: true }
+		{ v: st.user?.public_repos ?? 169, l: m.about_stats_repos() },
+		{ v: totalContribs, l: m.about_stats_contribs() },
+		{ v: stars, l: m.about_stats_stars() },
+		{ v: forks, l: m.about_stats_forks() },
+		{ v: st.user?.followers ?? 90, l: m.about_stats_followers() },
+		{ v: langs.length, l: m.about_stats_langs() }
 	]);
 </script>
 
-<section id="about" class="relative mx-auto max-w-shell scroll-mt-24 px-5 py-[16vh]">
-	<div {@attach reveal()}>
-		<p class="eyebrow mono-label text-gold">{m.about_whoami()}</p>
-		<h2 class="display mt-3 text-[clamp(1.9rem,5vw,3.4rem)]">{m.about_title()}</h2>
-	</div>
+<section id="about" class="relative mx-auto max-w-shell scroll-mt-24 px-5 py-[12vh]">
+	<header {@attach reveal()}>
+		<p class="data-label mb-2">№ 00 — {m.about_kicker()}</p>
+		<h2 class="serif text-[clamp(2.2rem,6vw,4rem)]">{m.about_title()}</h2>
+	</header>
 
-	<div class="mt-10 grid gap-5 md:grid-cols-6">
-		<!-- lead -->
-		<article class="glass card-lift p-6 md:col-span-4 md:p-8" {@attach reveal(80)}>
-			<p class="text-[1.05rem] leading-relaxed text-cream-dim md:text-lg">{m.about_lead()}</p>
-			<button
-				type="button"
-				onclick={() => paletteOpen.set(true)}
-				class="mono-label mt-6 inline-flex items-center gap-2 text-cream-faint transition-colors hover:text-gold"
-			>
-				{m.about_hint_cmdk()} <span class="kbd">⌘K</span>
-			</button>
+	<div class="mt-10 grid gap-5 lg:grid-cols-[1.45fr_1fr]">
+		<!-- statement -->
+		<article class="tick card flex flex-col justify-between p-6 sm:p-9" {@attach reveal(60)}>
+			<p class="serif text-[clamp(1.25rem,2.6vw,1.7rem)] leading-snug text-[var(--tx)]">
+				{m.about_lead()}
+			</p>
+			<div class="mt-8 border-t border-[var(--line)] pt-5">
+				<p class="data-label">{m.about_role_now()}</p>
+				<p class="mt-1.5 font-mono text-sm text-[var(--brass)]">{m.about_role_now_v()}</p>
+			</div>
 		</article>
 
-		<!-- language ring -->
+		<!-- instrument ring -->
 		<article
-			class="glass card-lift flex flex-col items-center justify-center gap-4 p-6 md:col-span-2"
+			class="tick card flex flex-col items-center justify-center gap-4 p-6"
+			{@attach reveal(120)}
 		>
-			<div class="relative h-40 w-40">
+			<div class="relative h-36 w-36">
 				<svg viewBox="0 0 42 42" class="h-full w-full -rotate-90">
-					<circle cx="21" cy="21" r="15.9" fill="none" stroke="#1b1e26" stroke-width="5" />
+					<circle
+						cx="21"
+						cy="21"
+						r="15.9"
+						fill="none"
+						stroke="var(--line-soft)"
+						stroke-width="4.5"
+					/>
 					{#each ring as seg (seg.lang)}
 						<circle
 							cx="21"
@@ -74,101 +89,83 @@
 							r="15.9"
 							fill="none"
 							stroke={seg.color}
-							stroke-width="5"
+							stroke-width="4.5"
 							stroke-dasharray={`${seg.pct} ${100 - seg.pct}`}
 							stroke-dashoffset={-seg.offset}
-							class="ring-seg"
 						/>
 					{/each}
 				</svg>
 				<div class="absolute inset-0 grid place-items-center text-center">
 					<div>
-						<p class="font-display text-2xl font-extrabold">{langs.length}</p>
-						<p class="mono-label text-cream-faint">{m.about_stats_langs()}</p>
+						<p class="serif text-2xl">{langs.length}</p>
+						<p class="data-label">{m.about_stats_langs()}</p>
 					</div>
 				</div>
 			</div>
 			<ul class="flex flex-wrap justify-center gap-x-3 gap-y-1">
 				{#each ring.slice(0, 5) as seg (seg.lang)}
-					<li class="flex items-center gap-1.5 text-xs text-cream-dim">
-						<span class="h-2 w-2 rounded-full" style:background={seg.color}></span>{seg.lang}
+					<li class="flex items-center gap-1.5 font-mono text-[0.66rem] text-[var(--tx-dim)]">
+						<span class="h-1.5 w-1.5 rounded-full" style:background={seg.color}></span>{seg.lang}
 					</li>
 				{/each}
 			</ul>
 		</article>
 
-		<!-- community -->
-		<article class="glass card-lift p-6 md:col-span-2" {@attach reveal(60)}>
-			<span class="mono-label text-teal">01</span>
-			<h3 class="mt-2 font-display text-lg font-bold">{m.about_community_title()}</h3>
-			<p class="mt-2 text-sm leading-relaxed text-cream-dim">{m.about_community_body()}</p>
-			<div class="mt-4 flex gap-2">
-				{#each ['Prisma', 'Supabase'] as c (c)}
+		<!-- roles worn -->
+		<article class="tick card p-6" {@attach reveal(60)}>
+			<h3 class="serif text-xl">{m.about_roles_title()}</h3>
+			<ul class="mt-4 space-y-2.5">
+				{#each m.about_roles().split(' · ') as role, i (role)}
+					<li class="flex items-baseline gap-3 text-sm text-[var(--tx-dim)]">
+						<span class="data-label">{String(i + 1).padStart(2, '0')}</span>
+						{role}
+					</li>
+				{/each}
+			</ul>
+		</article>
+
+		<!-- instruments + since -->
+		<article class="tick card p-6" {@attach reveal(120)}>
+			<h3 class="serif text-xl">{m.about_stack_title()}</h3>
+			<p class="mt-2 text-sm leading-relaxed text-[var(--tx-dim)]">{m.about_stack_body()}</p>
+			<div class="mt-4 flex flex-wrap gap-1.5">
+				{#each ['TS', 'Svelte', 'Rust', 'Java', 'Node', 'SQL', 'Nim', 'Docker'] as tool (tool)}
 					<span
-						class="rounded-full border border-ink-line px-2.5 py-1 font-mono text-[0.65rem] text-cream-faint"
+						class="border border-[var(--line)] bg-[var(--plate)] px-2 py-0.5 font-mono text-[0.62rem] text-[var(--tx-dim)]"
 					>
-						{c}
+						{tool}
 					</span>
 				{/each}
 			</div>
-		</article>
-
-		<!-- toolkit -->
-		<article class="glass card-lift p-6 md:col-span-2" {@attach reveal(140)}>
-			<span class="mono-label text-teal">02</span>
-			<h3 class="mt-2 font-display text-lg font-bold">{m.about_stack_title()}</h3>
-			<p class="mt-2 text-sm leading-relaxed text-cream-dim">{m.about_stack_body()}</p>
-			<div class="mt-4 flex flex-wrap gap-2">
-				{#each ['TS', 'Svelte', 'Rust', 'Java', 'Node', 'SQL', 'Nim', 'Docker'] as t (t)}
-					<span
-						class="rounded-full border border-ink-line px-2.5 py-1 font-mono text-[0.65rem] text-cream-faint"
-					>
-						{t}
-					</span>
-				{/each}
-			</div>
-		</article>
-
-		<!-- since -->
-		<article class="glass card-lift p-6 md:col-span-2" {@attach reveal(220)}>
-			<span class="mono-label text-teal">03</span>
-			<h3 class="mt-2 font-display text-lg font-bold">{m.about_since_title()}</h3>
-			<p class="mt-2 text-sm leading-relaxed text-cream-dim">{m.about_since_body()}</p>
-			<a
-				href={LINKS.repos}
-				target="_blank"
-				rel="noopener noreferrer"
-				class="mono-label mt-4 inline-flex items-center gap-1.5 text-gold transition-colors hover:text-gold-soft"
-			>
-				<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" class="opacity-80"
-					><path d={ICONS.github} /></svg
+			<p class="mt-5 border-t border-[var(--line)] pt-4 text-sm text-[var(--tx-dim)]">
+				{m.about_since_body()}
+				<a
+					href={LINKS.repos}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="ml-1 inline-flex items-center gap-1 text-[var(--brass)] hover:underline"
 				>
-				{m.projects_see_more_button()}
-			</a>
+					<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"
+						><path d={ICONS.github}></path></svg
+					>
+					{m.projects_see_more_button()}
+				</a>
+			</p>
 		</article>
 	</div>
 
-	<!-- stat rail -->
+	<!-- census strip -->
 	<dl
-		class="mt-5 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-ink-line bg-ink-line sm:grid-cols-3 lg:grid-cols-6"
+		class="mt-6 grid grid-cols-3 divide-x divide-[var(--line)] overflow-hidden rounded-lg border border-[var(--line)] sm:grid-cols-6"
+		{@attach reveal()}
 	>
 		{#each stats as s (s.l)}
-			<div class="bg-ink-soft/80 px-4 py-5 text-center backdrop-blur">
-				<dd
-					class="font-display text-xl font-extrabold text-cream sm:text-2xl"
-					class:text-gold={s.gold}
-					{@attach counter(s.v)}
-				>
+			<div class="bg-[var(--panel)] px-3 py-4 text-center">
+				<dd class="serif text-xl text-[var(--tx)] sm:text-2xl" {@attach counter(s.v)}>
 					{s.v.toLocaleString('en')}
 				</dd>
-				<dt class="mono-label mt-1.5 text-[0.55rem] text-cream-faint">{s.l}</dt>
+				<dt class="data-label mt-1 text-[0.52rem]">{s.l}</dt>
 			</div>
 		{/each}
 	</dl>
 </section>
-
-<style>
-	.ring-seg {
-		transition: stroke-dasharray 1s cubic-bezier(0.22, 1, 0.36, 1);
-	}
-</style>

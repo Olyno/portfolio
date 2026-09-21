@@ -1,13 +1,18 @@
 export const LINKS = {
 	github: 'https://github.com/Olyno',
 	x: 'https://x.com/Olyno_',
-	email: 'olyno.dev@gmail.com',
+	// assembled at render time from fragments so the literal address never
+	// appears in prerendered HTML — a light crawl-defense on a personal page
+	emailUser: 'olyno.dev',
+	emailHost: 'gmail.com',
 	coffee: 'https://www.buymeacoffee.com/olyno',
 	modaduck: 'https://modaduck.co',
 	modaduckX: 'https://x.com/hello_modaduck',
-	impeccable: 'https://impeccable.style',
+	patchbay: 'https://github.com/Olyno/patchbay',
 	repos: 'https://github.com/Olyno?tab=repositories'
 } as const;
+
+export const email = () => `${LINKS.emailUser}@${LINKS.emailHost}`;
 
 export const SECTIONS = ['home', 'about', 'projects', 'activity', 'contact'] as const;
 export type SectionId = (typeof SECTIONS)[number];

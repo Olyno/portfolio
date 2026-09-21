@@ -15,7 +15,7 @@
 		const out: { cells: { date: string; count: number; level: number }[]; month: string | null }[] =
 			[];
 		let col: { date: string; count: number; level: number }[] = [];
-		let lastMonthShown = -1;
+		let lastMonth = -1;
 		for (let i = 0; i < counts.length; i++) {
 			if (dates[i] > today) break;
 			const d = new Date(dates[i] + 'T00:00:00Z');
@@ -25,10 +25,9 @@
 			col.push({ date: dates[i], count: c, level });
 			if (col.length === 7) {
 				const month = d.getUTCMonth();
-				const showMonth =
-					month !== lastMonthShown ? d.toLocaleDateString(locale, { month: 'short' }) : null;
-				lastMonthShown = month;
-				out.push({ cells: col, month: showMonth });
+				const label = month !== lastMonth ? d.toLocaleDateString(locale, { month: 'short' }) : null;
+				lastMonth = month;
+				out.push({ cells: col, month: label });
 				col = [];
 			}
 		}
@@ -39,8 +38,8 @@
 	const shownCells = $derived(weeks.flatMap((w) => w.cells));
 	const active = $derived(shownCells.filter((c) => c.count > 0).length);
 
-	// busiest continuous 4-week stretch
-	const busy = $derived.by(() => {
+	// hottest continuous 4-week stretch — the survey's "peak"
+	const peak = $derived.by(() => {
 		const flat = shownCells;
 		let best = 0;
 		let bi = 0;
@@ -68,30 +67,37 @@
 	}
 </script>
 
-<section id="activity" class="relative mx-auto max-w-shell scroll-mt-24 px-5 py-[10vh]">
-	<div {@attach reveal()}>
-		<p class="eyebrow mono-label text-gold">03 — {m.nav_activity()}</p>
-		<h2 class="display mt-3 text-[clamp(1.9rem,5vw,3.4rem)]">{m.contrib_title()}</h2>
-		<p class="mt-3 max-w-2xl text-cream-dim">{m.contrib_subtitle()}</p>
-	</div>
+<section id="activity" class="relative mx-auto max-w-shell scroll-mt-24 px-5 py-[12vh]">
+	<header {@attach reveal()} class="flex flex-wrap items-end justify-between gap-6">
+		<div>
+			<p class="data-label mb-2">№ 04 — {m.nav_activity()}</p>
+			<h2 class="serif text-[clamp(2.2rem,6vw,4rem)]">{m.contrib_title()}</h2>
+			<p class="mt-3 max-w-xl text-[var(--tx-dim)]">{m.contrib_subtitle()}</p>
+		</div>
+		<!-- the ridge behind this section is the same dataset; say so -->
+		<p
+			class="hidden max-w-[16rem] border-l border-[var(--brass)] pl-4 font-mono text-[0.66rem] leading-relaxed text-[var(--tx-faint)] lg:block"
+		>
+			{m.contrib_parity()}
+		</p>
+	</header>
 
 	<div class="mt-10 grid gap-5 lg:grid-cols-[1fr_auto]">
-		<article class="glass overflow-x-auto p-6 sm:p-8" {@attach reveal(80)}>
-			<div class="min-w-[46rem]">
-				<div class="relative mb-3 h-4 font-mono text-[0.6rem] text-cream-faint">
+		<article class="tick card overflow-x-auto p-5 sm:p-7" {@attach reveal(60)}>
+			<div class="min-w-[44rem]">
+				<div class="relative mb-2.5 h-4 font-mono text-[0.6rem] text-[var(--tx-faint)]">
 					{#each weeks as w, i (i)}
 						{#if w.month}
-							<span
-								class="absolute top-0 whitespace-nowrap"
-								style:left={`${(i / weeks.length) * 100}%`}>{w.month}</span
+							<span class="absolute top-0" style:left={`${(i / weeks.length) * 100}%`}
+								>{w.month}</span
 							>
 						{/if}
 					{/each}
 				</div>
 
 				<div class="heat-grid" role="grid" aria-label={m.contrib_title()}>
-					{#each weeks as cell, wi (wi)}
-						{#each cell.cells as c (c.date)}
+					{#each weeks as wk, wi (wi)}
+						{#each wk.cells as c (c.date)}
 							<div
 								class="heat-cell"
 								role="gridcell"
@@ -104,33 +110,29 @@
 				</div>
 
 				<div
-					class="mt-4 flex items-center justify-end gap-1.5 font-mono text-[0.62rem] text-cream-faint"
+					class="mt-3.5 flex items-center justify-end gap-1.5 font-mono text-[0.6rem] text-[var(--tx-faint)]"
 				>
 					<span>{m.contrib_less()}</span>
 					{#each [0, 1, 2, 3, 4] as lv (lv)}
-						<span class="heat-cell h-3 w-3" data-level={lv}></span>
+						<span class="heat-cell h-2.5 w-2.5" data-level={lv}></span>
 					{/each}
 					<span>{m.contrib_more()}</span>
 				</div>
 			</div>
 		</article>
 
-		<dl class="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-			<div class="glass card-lift px-5 py-4" {@attach reveal(60)}>
-				<dd class="font-display text-2xl font-extrabold text-gold">
-					{totalContribs.toLocaleString('en')}
-				</dd>
-				<dt class="mono-label mt-1 text-cream-faint">{m.contrib_total({ n: totalContribs })}</dt>
+		<dl class="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+			<div class="tick card px-5 py-4" {@attach reveal(60)}>
+				<dd class="serif text-3xl text-[var(--brass)]">{totalContribs.toLocaleString('en')}</dd>
+				<dt class="data-label mt-1">{m.contrib_total({ n: totalContribs })}</dt>
 			</div>
-			<div class="glass card-lift px-5 py-4" {@attach reveal(120)}>
-				<dd class="font-display text-2xl font-extrabold text-cream">
-					{active.toLocaleString('en')}
-				</dd>
-				<dt class="mono-label mt-1 text-cream-faint">{m.contrib_active_days({ n: active })}</dt>
+			<div class="tick card px-5 py-4" {@attach reveal(120)}>
+				<dd class="serif text-3xl">{active.toLocaleString('en')}</dd>
+				<dt class="data-label mt-1">{m.contrib_active_days({ n: active })}</dt>
 			</div>
-			<div class="glass card-lift px-5 py-4" {@attach reveal(180)}>
-				<dd class="font-display text-xl font-extrabold text-teal">{busy.n.toLocaleString('en')}</dd>
-				<dt class="mono-label mt-1 text-cream-faint">{m.contrib_busiest()} · {busy.label}</dt>
+			<div class="tick card px-5 py-4" {@attach reveal(180)}>
+				<dd class="serif text-3xl">{peak.n.toLocaleString('en')}</dd>
+				<dt class="data-label mt-1">{m.contrib_busiest()} · {peak.label}</dt>
 			</div>
 		</dl>
 	</div>
