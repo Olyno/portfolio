@@ -327,7 +327,7 @@
 	<!-- ============ live GitHub grid ============ -->
 	<div class="mt-16 flex flex-wrap items-center gap-3" {@attach reveal()}>
 		<div
-			class="flex min-w-56 flex-1 items-center gap-2 rounded-full border border-ink-line bg-ink-soft/70 px-4 py-2.5 backdrop-blur focus-within:border-gold/50"
+			class="flex min-w-[14rem] flex-1 items-center gap-2 rounded-full border border-ink-line bg-ink-soft/70 px-4 py-2.5 backdrop-blur focus-within:border-gold/50"
 		>
 			<svg
 				width="14"
@@ -409,7 +409,7 @@
 				href={r.url}
 				target="_blank"
 				rel="noopener noreferrer"
-				class="repo-card glass card-lift group flex min-h-44 flex-col p-5"
+				class="repo-card glass card-lift group flex min-h-[11rem] flex-col p-5"
 				style:--accent={accent}
 				onmouseenter={() => activeRepo.set(r.name)}
 				onmouseleave={() => activeRepo.set(null)}

@@ -111,7 +111,7 @@
 		</h1>
 
 		<p
-			class="mx-auto mt-6 flex min-h-14 max-w-xl items-start justify-center gap-x-2 font-mono text-sm leading-7 text-cream-dim sm:text-base"
+			class="mx-auto mt-6 flex min-h-[3.5rem] max-w-xl items-start justify-center gap-x-2 font-mono text-sm leading-7 text-cream-dim sm:text-base"
 		>
 			<span class="shrink-0 text-cream-faint">{m.hero_role_prefix()}&nbsp;</span>
 			<span class="text-left text-teal"
