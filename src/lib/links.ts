@@ -13,6 +13,3 @@ export const LINKS = {
 } as const;
 
 export const email = () => `${LINKS.emailUser}@${LINKS.emailHost}`;
-
-export const SECTIONS = ['home', 'about', 'projects', 'activity', 'contact'] as const;
-export type SectionId = (typeof SECTIONS)[number];

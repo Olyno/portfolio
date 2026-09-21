@@ -74,12 +74,6 @@
 			<h2 class="serif text-[clamp(2.2rem,6vw,4rem)]">{m.contrib_title()}</h2>
 			<p class="mt-3 max-w-xl text-[var(--tx-dim)]">{m.contrib_subtitle()}</p>
 		</div>
-		<!-- the ridge behind this section is the same dataset; say so -->
-		<p
-			class="hidden max-w-[16rem] border-l border-[var(--brass)] pl-4 font-mono text-[0.66rem] leading-relaxed text-[var(--tx-faint)] lg:block"
-		>
-			{m.contrib_parity()}
-		</p>
 	</header>
 
 	<div class="mt-10 grid gap-5 lg:grid-cols-[1fr_auto]">

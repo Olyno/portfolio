@@ -24,3 +24,16 @@
 - **`edit` tool**: anchored edits need a fresh `read` of the exact region; tags from earlier in a
   long session silently corrupt files (happened 4×). Full `write` rewrites are safer for components
   that changed repeatedly.
+- **Feedback round 2 (2026-09-21):** Olyno rejected the 3D background as "too abstract for a
+  portfolio" and the hero/nav had a contrast failure in BOTH themes. Lesson: art direction beats
+  tech flex — the WebGL Survey was deleted entirely (`Stage.svelte`, `universe.ts`, `three` dep);
+  the site now reads as pure editorial print-survey (banner art + solid nav band + heavier veil).
+  Nav band: always near-solid `var(--plate)` gradient, never transparent over art. Hero veil:
+  plate-color bottom ramp reaching ~plate at 0-16% + left horizontal scrim 62%→28%→transparent;
+  text blocks must sit on ≥80% plate coverage.
+- **Official brand marks**: don't hand-draw approximations of logos (the X path was "not the
+  official one"). Extract the provided raster (flatten white → threshold → trim → 8-bit alpha) and
+  render via CSS `mask-image` + `bg-current` — theme-tinted, crisp, exact.
+- **`vite preview` snapshots `build/` at start** — every rebuild mid-QA serves 404s for new hashed
+  chunks while old pages keep working; looked like a hydration bug three times. Restart it with
+  every verification round.

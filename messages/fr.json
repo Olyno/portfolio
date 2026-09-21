@@ -10,7 +10,7 @@
 	"hero_title_a": "Bonjour, je m'appelle",
 	"hero_title_b": "Olyno",
 	"hero_role_prefix": "En ce moment :",
-	"hero_cta_projects": "Explorer l'univers",
+	"hero_cta_projects": "Explorer les projets",
 	"hero_cta_contact": "Dire bonjour",
 	"hero_scroll": "Scroller pour plonger",
 	"hero_meta_repos": "repos publics",
@@ -58,7 +58,7 @@
 	"contact_github_cta": "Coder sur GitHub",
 	"contact_coffee_cta": "Offrir un café",
 	"footer_rights": "© 2026 Olyno. Tous droits réservés.",
-	"footer_built": "Relevé avec SvelteKit, three.js et bien trop de café.",
+	"footer_built": "Relevé avec SvelteKit, TypeScript et bien trop de café.",
 	"footer_back_top": "Haut de page",
 	"palette_placeholder": "Tapez une commande ou cherchez un repo…",
 	"palette_go": "Navigation",
@@ -83,11 +83,6 @@
 	"hero_role_6": "je lance des idées, je les finis",
 	"status_building": "en construction",
 	"hero_banner_alt": "Bannière d'Olyno — chats cosmiques à l'observatoire néon",
-	"hud_survey": "olyno.dev — relevé de terrain",
-	"plate_0": "champ d'étoiles · {n} dépôts publics cartographiés",
-	"plate_1": "constellation · chaque étoile = un dépôt, éclat = étoiles gagnées",
-	"plate_2": "crête de contributions · 365 jours relevés, hauteur = {n} contributions",
-	"plate_3": "horizon · la suite reste à écrire",
 	"about_kicker": "l'humain derrière les données",
 	"about_role_now": "En ce moment",
 	"about_role_now_v": "Je construis PatchBay, un espace de connaissances E2EE",
@@ -98,6 +93,5 @@
 	"projects_kicker": "les spécimens",
 	"projects_oss_more": "open-source, archivés & divers",
 	"contact_email_hint": "caché volontairement — cliquez pour révéler, puis copiez",
-	"a11y_theme": "Basculer clair et sombre",
-	"contrib_parity": "La crête dorée derrière ce panneau est cette grille exacte, extrudée — une colonne par jour."
+	"a11y_theme": "Basculer clair et sombre"
 }

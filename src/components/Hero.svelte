@@ -107,9 +107,12 @@
 	>
 		<img
 			src="/images/brand/banner.webp"
+			srcset="/images/brand/banner-960.webp 960w, /images/brand/banner.webp 1920w"
+			sizes="100vw"
 			alt={m.hero_banner_alt()}
 			class="banner-img h-full w-full object-cover"
 			fetchpriority="high"
+			decoding="async"
 		/>
 		<div class="veil"></div>
 	</div>
@@ -205,21 +208,25 @@
 	.banner-img {
 		filter: saturate(0.92) contrast(1.02);
 	}
-	/* duotone veil: keeps the artwork visible but readable under text */
+	/* readability veil: the art fades into a solid plate where the copy lives */
 	.veil {
 		position: absolute;
 		inset: 0;
 		background:
 			linear-gradient(
 				to top,
-				color-mix(in srgb, var(--plate) 88%, transparent) 0%,
-				color-mix(in srgb, var(--plate) 30%, transparent) 38%,
-				transparent 70%
+				var(--plate) 0%,
+				color-mix(in srgb, var(--plate) 96%, transparent) 16%,
+				color-mix(in srgb, var(--plate) 82%, transparent) 34%,
+				color-mix(in srgb, var(--plate) 40%, transparent) 55%,
+				color-mix(in srgb, var(--plate) 8%, transparent) 78%,
+				transparent 100%
 			),
-			radial-gradient(
-				120% 90% at 85% 10%,
-				transparent 30%,
-				color-mix(in srgb, var(--plate) 35%, transparent) 100%
+			linear-gradient(
+				to right,
+				color-mix(in srgb, var(--plate) 62%, transparent) 0%,
+				color-mix(in srgb, var(--plate) 28%, transparent) 38%,
+				transparent 62%
 			);
 	}
 	.brass-dot {

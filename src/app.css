@@ -38,7 +38,7 @@ html[data-theme='light'] {
 	--line-soft: #e6dcc6;
 	--tx: #1e1b14;
 	--tx-dim: #57503f;
-	--tx-faint: #8a8170;
+	--tx-faint: #6f6754;
 	--brass: #9a7422;
 	--brass-deep: #7c5c17;
 	--ember: #a34d2c;
@@ -56,7 +56,7 @@ html[data-theme='dark'] {
 	--line-soft: #1c232e;
 	--tx: #e9e4d6;
 	--tx-dim: #9aa1ac;
-	--tx-faint: #646b77;
+	--tx-faint: #7d8490;
 	--brass: #d9a441;
 	--brass-deep: #b98a2c;
 	--ember: #e07a53;
@@ -121,18 +121,6 @@ html[data-theme='dark'] {
 /* ------------------------------------------------------------------ *
  * WebGL exhibit plate — the background IS the data, labelled as such
  * ------------------------------------------------------------------ */
-.stage {
-	position: fixed;
-	inset: 0;
-	z-index: 0;
-	pointer-events: none;
-}
-.stage canvas {
-	display: block;
-	width: 100% !important;
-	height: 100% !important;
-}
-
 /* corner registration marks on the viewport — print-plate motif */
 .marks {
 	position: fixed;
@@ -188,32 +176,6 @@ html[data-theme='dark'] {
 	right: 0;
 	bottom: 0;
 	transform: scale(-1);
-}
-
-/* HUD readout naming the current plate (kept in sync by Stage.svelte) */
-.hud {
-	position: fixed;
-	left: 1.25rem;
-	bottom: 1.25rem;
-	z-index: 5;
-	pointer-events: none;
-	font-family: var(--font-mono);
-	font-size: 0.6rem;
-	letter-spacing: 0.14em;
-	text-transform: uppercase;
-	color: var(--tx-faint);
-	display: flex;
-	flex-direction: column;
-	gap: 0.25rem;
-	max-width: min(22rem, 60vw);
-}
-.hud .no {
-	color: var(--brass);
-}
-.hud .rule {
-	width: 3.5rem;
-	height: 1px;
-	background: var(--line);
 }
 
 /* film grain (subtle, static-ish) */

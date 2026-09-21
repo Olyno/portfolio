@@ -10,7 +10,7 @@
 	"hero_title_a": "Hi, I'm",
 	"hero_title_b": "Olyno",
 	"hero_role_prefix": "Currently:",
-	"hero_cta_projects": "Explore the universe",
+	"hero_cta_projects": "Explore the work",
 	"hero_cta_contact": "Say hello",
 	"hero_scroll": "Scroll to dive in",
 	"hero_meta_repos": "public repos",
@@ -58,7 +58,7 @@
 	"contact_github_cta": "Pair on GitHub",
 	"contact_coffee_cta": "Buy me a coffee",
 	"footer_rights": "© 2026 Olyno. All rights reserved.",
-	"footer_built": "Surveyed with SvelteKit, three.js & far too much coffee.",
+	"footer_built": "Surveyed with SvelteKit, TypeScript & far too much coffee.",
 	"footer_back_top": "Back to top",
 	"palette_placeholder": "Type a command or search repos…",
 	"palette_go": "Navigation",
@@ -83,11 +83,6 @@
 	"hero_role_6": "starting ideas, finishing them",
 	"status_building": "in the forge",
 	"hero_banner_alt": "Olyno's banner artwork — cosmic cats at the neon observatory",
-	"hud_survey": "olyno.dev — field survey",
-	"plate_0": "starfield · {n} public repos charted as one field",
-	"plate_1": "constellation · each star = a repository, brightness = stars earned",
-	"plate_2": "contribution ridge · 365 surveyed days, height = {n} contributions",
-	"plate_3": "horizon · what comes next is open",
 	"about_kicker": "the human behind the data",
 	"about_role_now": "Currently",
 	"about_role_now_v": "Building PatchBay, an E2EE knowledge workspace",
@@ -98,6 +93,5 @@
 	"projects_kicker": "the specimens",
 	"projects_oss_more": "open-source, archived & misc",
 	"contact_email_hint": "hidden on purpose — click to reveal, then copy",
-	"a11y_theme": "Toggle light and dark",
-	"contrib_parity": "The gold ridge behind this panel is this exact grid, extruded — one column per day."
+	"a11y_theme": "Toggle light and dark"
 }

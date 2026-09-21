@@ -6,7 +6,6 @@
 	import { paletteOpen } from '$lib/palette';
 	import { setScroller } from '$lib/scroller';
 	import Nav from '$components/Nav.svelte';
-	import Stage from '$components/Stage.svelte';
 	import CommandPalette from '$components/CommandPalette.svelte';
 	import Cursor from '$components/Cursor.svelte';
 	import { m } from '$lib/paraglide/messages.js';
@@ -87,7 +86,7 @@
 	<span class="bar"></span>
 </div>
 
-<Stage />
+<div class="marks" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
 <div class="grain" aria-hidden="true"></div>
 <Cursor />
 {#key $localeVersion}
