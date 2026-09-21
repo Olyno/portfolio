@@ -3,8 +3,8 @@ export const LINKS = {
 	x: 'https://x.com/Olyno_',
 	// assembled at render time from fragments so the literal address never
 	// appears in prerendered HTML — a light crawl-defense on a personal page
-	emailUser: 'olyno.dev',
-	emailHost: 'gmail.com',
+	emailUser: 'contact',
+	emailHost: 'olyno.dev',
 	coffee: 'https://www.buymeacoffee.com/olyno',
 	modaduck: 'https://modaduck.co',
 	modaduckX: 'https://x.com/hello_modaduck',
