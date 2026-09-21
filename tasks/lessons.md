@@ -37,3 +37,9 @@
 - **`vite preview` snapshots `build/` at start** — every rebuild mid-QA serves 404s for new hashed
   chunks while old pages keep working; looked like a hydration bug three times. Restart it with
   every verification round.
+- **Feedback round 3 (2026-09-21):** "text too far left" had a hidden root cause — `max-w-shell`
+  was used in 7 components but NEVER defined (Tailwind v4 unknown utility → silently no CSS → full
+  bleed). Define it via `@theme { --container-shell: 78rem; }`. Theme separation: dark plate pushed
+  to #07090d vs light #f6efdf. Avatar: a design must *compose* the portrait (220px framed plate +
+  caption), not staple a 72px ring to a corner. Brand icons: ship the official artwork as real
+  `<img>` pairs (black/white), not span/mask approximations, until asked otherwise.
