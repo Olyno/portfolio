@@ -1,32 +1,36 @@
 <script lang="ts">
-	import LL from '$i18n/i18n-svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { localeVersion } from '$lib/locale';
+	import { ICONS } from '$lib/icons';
+	import { scrollToEl } from '$lib/scroller';
+
+	$localeVersion;
 </script>
 
-<footer class="w-full bg-highlight text-primary py-6 px-8">
-	<div class="text-center">
-		<p>
-			&copy; 2023 Olyno. {@html $LL.footer
-				.content()
-				.replaceAll(
-					'GitHub',
-					`<a
-						href="https://github.com/Olyno"
-						target="_blank"
-						class="text-secondary hover:text-background transition-colors duration-300"
-					>
-						GitHub
-					</a>`
-				)
-				.replaceAll(
-					'Twitter',
-					`<a
-						href="https://twitter.com/OlynoWorker"
-						target="_blank"
-						class="text-secondary hover:text-background transition-colors duration-300"
-					>
-						Twitter
-					</a>`
-				)}
-		</p>
+<footer class="relative z-10 border-t border-ink-line bg-ink-soft/70 backdrop-blur-md">
+	<div
+		class="mx-auto flex max-w-shell flex-col items-center justify-between gap-5 px-5 py-8 sm:flex-row"
+	>
+		<p class="text-sm text-cream-faint">{m.footer_rights()}</p>
+		<p class="font-mono text-[0.66rem] text-cream-faint">{m.footer_built()}</p>
+		<button
+			type="button"
+			onclick={() => scrollToEl(0)}
+			class="group inline-flex items-center gap-2 text-sm text-cream-dim transition-colors hover:text-gold"
+		>
+			{m.footer_back_top()}
+			<span class="inline-block -rotate-90 transition-transform group-hover:-translate-y-0.5">
+				<svg
+					width="14"
+					height="14"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2.4"
+					stroke-linecap="round"
+					stroke-linejoin="round"><path d={ICONS.chevron} /></svg
+				>
+			</span>
+		</button>
 	</div>
 </footer>

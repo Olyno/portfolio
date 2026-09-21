@@ -1,38 +1,34 @@
-# create-svelte
+# olyno.dev — The Universe Portfolio
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+Portfolio of [Olyno](https://github.com/Olyno): idea starter, open-source enthusiast and full-stack
+developer. One continuous WebGL flight driven by scroll — built with SvelteKit 2, Svelte 5 (runes),
+three.js, GSAP-grade hand-rolled motion, Lenis smooth scroll, Paraglide i18n and Tailwind.
 
-## Creating a project
+## What makes it tick
 
-If you're seeing this, you've probably already done this step. Congrats!
+- **`src/lib/three/universe.ts`** — the whole site is one camera path through a 3D scene:
+  starfield (custom shaders with distance-fade) → repo constellation (instanced orbs sized by ⭐,
+  hover with raycasting + live tooltips) → contribution terrain (365 real GitHub days as 3D bars,
+  hover for exact counts) → contact vortex with brass ring. Section anchors remap scroll position to
+  path position via keyframes, so DOM and camera stay in lockstep.
+- **`src/lib/github.ts`** — baked snapshot ships in the bundle (instant paint, works offline), then
+  revalidates live against the GitHub REST API.
+- **`messages/*.json` + Paraglide** — EN/FR; the switch re-keys the UI (`{#key localeVersion}`),
+  cookie-persisted, no reload.
+- **SEO** — SSR-prerendered real content, JSON-LD Person schema, OG/Twitter cards, `robots.txt`,
+  `sitemap.xml`, PWA.
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+## Dev
 
-# create a new project in my-app
-npm create svelte@latest my-app
+```sh
+pnpm install
+pnpm dev        # vite dev + paraglide compile on save
+pnpm build      # static adapter → build/
+pnpm check      # svelte-check
+pnpm test       # playwright
 ```
 
-## Developing
+## Deploy
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+Push to `master` → GitHub Actions builds and publishes `build/` to `gh-pages` at
+[olyno.dev](https://olyno.dev).

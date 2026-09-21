@@ -8,3 +8,9 @@ node_modules
 !.env.example
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+# Paraglide
+src/lib/paraglide
+
+# playwright
+test-results/
+playwright-report/

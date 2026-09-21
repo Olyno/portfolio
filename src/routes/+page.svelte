@@ -1,23 +1,15 @@
-<script context="module" lang="ts">
-	import AboutMe from '$components/AboutMe.svelte';
-	import Footer from '$components/Footer.svelte';
+<script lang="ts">
 	import Hero from '$components/Hero.svelte';
-	import Navbar from '$components/Navbar.svelte';
+	import About from '$components/About.svelte';
 	import Projects from '$components/Projects.svelte';
+	import Activity from '$components/Activity.svelte';
+	import Contact from '$components/Contact.svelte';
+	import Footer from '$components/Footer.svelte';
 </script>
 
-<div class="flex min-h-screen">
-	<Navbar />
-
-	<main class="md:w-3/4 w-full bg-background px-12 py-8 font-body">
-		<Hero />
-
-		<AboutMe />
-
-		<Projects />
-
-		<!-- <BlogPosts /> -->
-	</main>
-</div>
-
+<Hero />
+<About />
+<Projects />
+<Activity />
+<Contact />
 <Footer />
