@@ -31,6 +31,7 @@ export const curated: CuratedProject[] = [
 		stack: ['Rust', 'Tauri 2', 'SvelteKit', 'TypeScript', 'MCP', 'E2EE'],
 		kind: 'product',
 		url: 'https://github.com/Olyno/patchbay',
+		x: 'https://x.com/withpatchbay',
 		gh: 'patchbay',
 		badge: 'flagship',
 		hero: {

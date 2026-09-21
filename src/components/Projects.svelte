@@ -183,6 +183,17 @@
 							>
 						</a>
 						<span class="font-mono text-xs text-[var(--tx-faint)]">{patchbay.role}</span>
+						{#if patchbay.x}
+							<a
+								href={patchbay.x}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="inline-flex items-center gap-1.5 font-mono text-xs text-[var(--tx-faint)] transition-colors hover:text-[var(--brass)]"
+							>
+								<XLogo size={11} />
+								@withpatchbay
+							</a>
+						{/if}
 					</div>
 				</div>
 
