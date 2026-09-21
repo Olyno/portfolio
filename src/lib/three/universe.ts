@@ -3,14 +3,19 @@ import type { GhRepo } from '$lib/github';
 import { contributions } from '$lib/github';
 
 /* ------------------------------------------------------------------ *
- * The Universe — one continuous WebGL flight synced to document scroll.
- *   zone 0  : hero starfield + nebula
- *   zone ~60: repo constellation (orbs + links), hoverable
- *   zone ~130: contribution terrain (365 instanced bars, real data)
- *   zone ~190: contact vortex + brass ring
+ * THE SURVEY — the fixed background is literally the data, dressed as
+ * an observatory plate the visitor flies across as they scroll:
+ *
+ *   plate 00  · starfield          (the field: 169 public repos → N stars)
+ *   plate 01  · repo constellation (each repo = one star, linked to nearest)
+ *   plate 02  · contribution ridge (one column per surveyed day, height = n)
+ *   plate 03  · contact horizon    (a rising brass sun = "what's next")
+ *
+ * Stage.svelte reads CSS vars for theme colors and publishes the current
+ * plate's caption to the HUD, so the background always *names itself*.
  * ------------------------------------------------------------------ */
 
-export interface RepoOrb {
+export interface RepoStar {
 	name: string;
 	url: string;
 	stars: number;
@@ -19,11 +24,10 @@ export interface RepoOrb {
 	z: number;
 }
 
-export interface HoverPayload {
+export interface StarHover {
 	name: string;
 	url: string;
 	stars: number;
-	/** normalized screen px for tooltip placement */
 	sx: number;
 	sy: number;
 }
@@ -35,39 +39,34 @@ export interface DayHover {
 	sy: number;
 }
 
-interface UniverseCallbacks {
-	onRepoHover?: (h: HoverPayload | null) => void;
+export interface Callbacks {
+	onStarHover?: (h: StarHover | null) => void;
 	onDayHover?: (h: DayHover | null) => void;
 }
 
-const HERO_Z = 10;
-const ORB_Z = -62;
-const TERRAIN_Z = -132;
-const CONTACT_Z = -192;
-
-const CREAM = new THREE.Color('#f6f1e3');
-const BRASS = new THREE.Color('#e7b84f');
-const TEAL = new THREE.Color('#2dd4bf');
-const NOVA = new THREE.Color('#7c9cf5');
+const PLATE_Z = [0, -70, -145, -215]; // star / constellation / ridge / horizon
 
 const easeInOutSine = (t: number) => -(Math.cos(Math.PI * t) - 1) / 2;
 
-function radialSprite(inner: string, outer: string): THREE.Texture {
+function dotTexture(inner = 'rgba(255,255,255,1)', edge = 'rgba(255,255,255,0)'): THREE.Texture {
 	const c = document.createElement('canvas');
-	c.width = c.height = 128;
-	const ctx = c.getContext('2d')!;
-	const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+	c.width = c.height = 64;
+	const x = c.getContext('2d')!;
+	const g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
 	g.addColorStop(0, inner);
-	g.addColorStop(0.35, outer);
-	g.addColorStop(1, 'rgba(0,0,0,0)');
-	ctx.fillStyle = g;
-	ctx.fillRect(0, 0, 128, 128);
+	g.addColorStop(0.5, 'rgba(255,255,255,.35)');
+	g.addColorStop(1, edge);
+	x.fillStyle = g;
+	x.fillRect(0, 0, 64, 64);
 	const t = new THREE.CanvasTexture(c);
 	t.colorSpace = THREE.SRGBColorSpace;
 	return t;
 }
 
-export class Universe {
+const css = (name: string) =>
+	getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+export class Survey {
 	posCurve: THREE.CatmullRomCurve3;
 	lookCurve: THREE.CatmullRomCurve3;
 
@@ -79,49 +78,55 @@ export class Universe {
 	private raf = 0;
 	private disposed = false;
 
-	private stars: THREE.Points | null = null;
-	private shooters: THREE.Points | null = null;
-	private orbMesh: THREE.InstancedMesh | null = null;
-	private orbGlow: THREE.Points | null = null;
-	private orbLines: THREE.LineSegments | null = null;
-	private orbs: RepoOrb[] = [];
-	private terrain: THREE.InstancedMesh | null = null;
+	private stars!: THREE.Points;
+	private starMat!: THREE.ShaderMaterial;
+	private starBase = new THREE.Color('#1e1b14');
+
+	private field!: THREE.Points; // constellation bodies
+	private fieldMat!: THREE.ShaderMaterial;
+	private links!: THREE.LineSegments;
+	private linkMat!: THREE.LineBasicMaterial;
+	private suns: RepoStar[] = [];
+
+	private ridge!: THREE.InstancedMesh;
+	private ridgeMat!: THREE.MeshBasicMaterial;
 	private dayGrid: { x: number; z: number; h: number; date: string; count: number }[] = [];
-	private vortex: THREE.Points | null = null;
-	private ring: THREE.Mesh | null = null;
+
+	private sun!: THREE.Mesh;
+	private sunMat!: THREE.MeshBasicMaterial;
+	private sunGlow!: THREE.Sprite;
 
 	private mouse = new THREE.Vector2(0, 0);
-	private smoothMouse = new THREE.Vector2(0, 0);
-	private raycaster = new THREE.Raycaster();
-	private hoverOrb = -1;
+	private smooth = new THREE.Vector2(0, 0);
+	private ray = new THREE.Raycaster();
+	private hoverStar = -1;
 	private hoverDay = -1;
-	private smoothP = 0;
-	private keyframeMap: [number, number][] = [[0, 0]];
+	private p = 0;
+	private keyframes: [number, number][] = [[0, 0]];
+	private rayClock = 0;
 
 	constructor(
-		private canvas: HTMLCanvasElement,
-		private cb: UniverseCallbacks = {},
+		canvas: HTMLCanvasElement,
+		private cb: Callbacks = {},
 		private quality: 'high' | 'low' = 'high'
 	) {
 		this.renderer = new THREE.WebGLRenderer({
 			canvas,
-			antialias: quality === 'high',
-			alpha: false,
+			antialias: false,
 			powerPreference: 'high-performance'
 		});
-		this.renderer.setClearColor(0x07080a, 1);
-		this.renderer.setPixelRatio(Math.min(devicePixelRatio, quality === 'high' ? 1.75 : 1.25));
+		this.renderer.setPixelRatio(Math.min(devicePixelRatio, quality === 'high' ? 1.5 : 1));
 
-		this.camera = new THREE.PerspectiveCamera(62, 1, 0.1, 420);
-		this.scene.fog = new THREE.FogExp2(0x07080a, 0.0105);
+		this.camera = new THREE.PerspectiveCamera(58, 1, 0.1, 400);
 
-		const curves = this.buildCurves();
-		this.posCurve = curves[0];
-		this.lookCurve = curves[1];
-		this.buildStars();
-		this.buildTerrain();
-		this.buildContact();
-		if (quality === 'high') this.buildShooters();
+		const [pos, look] = this.buildCurves();
+		this.posCurve = pos;
+		this.lookCurve = look;
+
+		this.buildField();
+		this.buildRidge();
+		this.buildSun();
+		this.applyTheme();
 
 		this.resize();
 		addEventListener('resize', this.resize);
@@ -129,367 +134,316 @@ export class Universe {
 		this.loop();
 	}
 
-	/* ---------------- geometry builders ---------------- */
+	/** re-read CSS theme vars on light/dark flip */
+	applyTheme() {
+		const bg = new THREE.Color(css('--plate') || '#f2ead8');
+		const ink = new THREE.Color(css('--scene-1') || '#1e1b14');
+		const brass = new THREE.Color(css('--brass') || '#9a7422');
+		this.renderer.setClearColor(bg, 1);
+		this.scene.fog = new THREE.FogExp2(bg.getHex(), 0.0075);
+		if (this.stars) {
+			this.starMat.uniforms.uColor.value = ink;
+			this.starBase = ink.clone();
+		}
+		if (this.field) {
+			this.fieldMat.uniforms.uColor.value = brass.clone();
+			this.fieldMat.uniforms.uInk.value = ink.clone();
+		}
+		if (this.links) this.linkMat.color = brass.clone().lerp(ink, 0.45);
+		if (this.sun) this.sunMat.color = brass.clone();
+		if (this.ridge) this.recolorRidge(bg, brass);
+		if (this.sunGlow) {
+			(this.sunGlow.material as THREE.SpriteMaterial).color = brass.clone();
+			(this.sunGlow.material as THREE.SpriteMaterial).opacity = 0.35;
+		}
+	}
+
+	/** rebuild per-day instance colors for the active theme */
+	private recolorRidge(bg: THREE.Color, brass: THREE.Color) {
+		if (!this.ridge) return;
+		const max = Math.max(...this.dayGrid.map((d) => d.count), 1);
+		const c = new THREE.Color();
+		for (let i = 0; i < this.dayGrid.length; i++) {
+			const norm = Math.pow(this.dayGrid[i].count / max, 0.6);
+			c.copy(bg).lerp(brass, 0.08 + Math.min(1, norm * 1.5) * 0.92);
+			this.ridge.setColorAt(i, c);
+		}
+		if (this.ridge.instanceColor) this.ridge.instanceColor.needsUpdate = true;
+	}
 
 	private buildCurves(): [THREE.CatmullRomCurve3, THREE.CatmullRomCurve3] {
 		const pos = new THREE.CatmullRomCurve3(
 			[
-				new THREE.Vector3(0, 0, HERO_Z + 6),
-				new THREE.Vector3(0, 0, HERO_Z - 6),
-				new THREE.Vector3(0, 17, ORB_Z + 24),
-				new THREE.Vector3(0, 15, ORB_Z - 2),
-				new THREE.Vector3(0, 15, TERRAIN_Z + 24),
-				new THREE.Vector3(0, 9, TERRAIN_Z - 4),
-				new THREE.Vector3(0, 2.2, CONTACT_Z + 18),
-				new THREE.Vector3(0, 1.6, CONTACT_Z + 6)
+				new THREE.Vector3(0, 0, 14),
+				new THREE.Vector3(0, 1, PLATE_Z[1] + 26),
+				new THREE.Vector3(0, 2.5, PLATE_Z[1] + 8),
+				new THREE.Vector3(0, 16, PLATE_Z[2] + 20),
+				new THREE.Vector3(0, 10, PLATE_Z[2] - 6),
+				new THREE.Vector3(0, 3.5, PLATE_Z[3] + 16),
+				new THREE.Vector3(0, 3, PLATE_Z[3] + 4)
 			],
 			false,
 			'catmullrom',
-			0.35
+			0.4
 		);
 		const look = new THREE.CatmullRomCurve3(
 			[
-				new THREE.Vector3(0, 0, HERO_Z - 20),
-				new THREE.Vector3(0, 0, HERO_Z - 40),
-				new THREE.Vector3(0, 3, ORB_Z + 2),
-				new THREE.Vector3(0, 2, ORB_Z - 10),
-				new THREE.Vector3(0, 0, TERRAIN_Z + 4),
-				new THREE.Vector3(0, 0, TERRAIN_Z - 26),
-				new THREE.Vector3(0, 3, CONTACT_Z - 4),
-				new THREE.Vector3(0, 3, CONTACT_Z - 12)
+				new THREE.Vector3(0, 0, -12),
+				new THREE.Vector3(0, 3, PLATE_Z[1] - 4),
+				new THREE.Vector3(0, 2, PLATE_Z[1] - 16),
+				new THREE.Vector3(0, 0, PLATE_Z[2] + 2),
+				new THREE.Vector3(0, -1, PLATE_Z[2] - 28),
+				new THREE.Vector3(0, 5, PLATE_Z[3] - 6),
+				new THREE.Vector3(0, 5, PLATE_Z[3] - 14)
 			],
 			false,
 			'catmullrom',
-			0.35
+			0.4
 		);
 		return [pos, look];
 	}
 
-	private buildStars() {
-		const n = this.quality === 'high' ? 2600 : 1200;
+	/* ---------- plate 00/01: starfield + constellation ---------- */
+
+	private buildField() {
+		const n = this.quality === 'high' ? 1400 : 650;
 		const pos = new Float32Array(n * 3);
-		const col = new Float32Array(n * 3);
 		const size = new Float32Array(n);
 		const seed = new Float32Array(n);
-		const c = new THREE.Color();
 		for (let i = 0; i < n; i++) {
-			const r = 26 + Math.random() * 90;
+			const r = 30 + Math.random() * 95;
 			const th = Math.random() * Math.PI * 2;
 			pos[i * 3] = Math.cos(th) * r;
-			pos[i * 3 + 1] = (Math.random() - 0.5) * 110;
-			pos[i * 3 + 2] = -Math.random() * 260 + 26;
-			const pick = Math.random();
-			if (pick < 0.72) c.copy(CREAM).multiplyScalar(0.75 + Math.random() * 0.25);
-			else if (pick < 0.86) c.copy(BRASS);
-			else if (pick < 0.94) c.copy(TEAL).multiplyScalar(0.85);
-			else c.copy(NOVA);
-			col[i * 3] = c.r;
-			col[i * 3 + 1] = c.g;
-			col[i * 3 + 2] = c.b;
-			size[i] = 0.6 + Math.pow(Math.random(), 3) * 2.6;
-			seed[i] = Math.random() * Math.PI * 2;
+			pos[i * 3 + 1] = (Math.random() - 0.5) * 120;
+			pos[i * 3 + 2] = -Math.random() * 270 + 16;
+			size[i] = 0.7 + Math.pow(Math.random(), 3) * 2.4;
+			seed[i] = Math.random() * 6.283;
 		}
 		const geo = new THREE.BufferGeometry();
 		geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-		geo.setAttribute('aColor', new THREE.BufferAttribute(col, 3));
 		geo.setAttribute('aSize', new THREE.BufferAttribute(size, 1));
 		geo.setAttribute('aSeed', new THREE.BufferAttribute(seed, 1));
 
-		const mat = new THREE.ShaderMaterial({
+		// quiet twinkle — a field notebook, not a screensaver
+		this.starMat = new THREE.ShaderMaterial({
 			transparent: true,
 			depthWrite: false,
-			blending: THREE.AdditiveBlending,
 			uniforms: {
 				uTime: { value: 0 },
 				uPix: { value: this.renderer.getPixelRatio() },
-				uTex: { value: radialSprite('rgba(255,255,255,1)', 'rgba(255,255,255,.28)') }
+				uColor: { value: this.starBase.clone() },
+				uTex: { value: dotTexture() }
 			},
 			vertexShader: /* glsl */ `
-				attribute vec3 aColor;
 				attribute float aSize;
 				attribute float aSeed;
-				uniform float uTime;
-				uniform float uPix;
-				varying vec3 vColor;
-				varying float vTw;
+				uniform float uTime; uniform float uPix;
+				varying float vA;
 				void main() {
-					vColor = aColor;
-					vTw = 0.6 + 0.4 * sin(uTime * (0.6 + fract(aSeed) * 1.4) + aSeed * 9.0);
+					vA = 0.5 + 0.5 * sin(uTime * 0.7 + aSeed * 9.0);
 					vec4 mv = modelViewMatrix * vec4(position, 1.0);
-					float near = smoothstep(10.0, 26.0, -mv.z);
-					vTw = vTw * near;
-					gl_PointSize = min(aSize * uPix * (26.0 / -mv.z), 7.0 * uPix);
+					float near = smoothstep(9.0, 24.0, -mv.z);
+					gl_PointSize = min(aSize * uPix * (22.0 / -mv.z), 5.5 * uPix) * near;
 					gl_Position = projectionMatrix * mv;
 				}`,
 			fragmentShader: /* glsl */ `
-				uniform sampler2D uTex;
-				varying vec3 vColor;
-				varying float vTw;
+				uniform vec3 uColor; uniform sampler2D uTex;
+				varying float vA;
 				void main() {
-					vec4 t = texture2D(uTex, gl_PointCoord);
-					gl_FragColor = vec4(vColor * (0.55 + 0.45 * vTw), t.a * vTw);
+					float a = texture2D(uTex, gl_PointCoord).a;
+					gl_FragColor = vec4(uColor, a * (0.35 + 0.4 * vA));
 				}`
 		});
-		this.stars = new THREE.Points(geo, mat);
+		this.stars = new THREE.Points(geo, this.starMat);
 		this.scene.add(this.stars);
 	}
 
-	private buildShooters() {
-		const geo = new THREE.BufferGeometry();
-		geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(3), 3));
-		const mat = new THREE.PointsMaterial({
-			map: radialSprite('rgba(255,240,200,1)', 'rgba(255,220,140,.4)'),
-			size: 3.2,
-			sizeAttenuation: false,
-			transparent: true,
-			opacity: 0,
-			blending: THREE.AdditiveBlending,
-			depthWrite: false
-		});
-		this.shooters = new THREE.Points(geo, mat);
-		this.shooters.userData = { t: -1, v: new THREE.Vector3(), origin: new THREE.Vector3() };
-		this.scene.add(this.shooters);
-	}
-
-	/** swap the repo constellation whenever live data lands */
 	setRepos(repos: GhRepo[]) {
-		const top = repos
+		const list = repos
 			.slice()
 			.sort((a, b) => b.stars - a.stars || (a.updated < b.updated ? 1 : -1))
-			.slice(0, this.quality === 'high' ? 42 : 24);
+			.slice(0, this.quality === 'high' ? 60 : 30);
 
-		this.orbs = top.map((r, i) => {
-			// fibonacci sphere around ORB_Z, stretched horizontally
-			const phi = Math.acos(1 - (2 * (i + 0.5)) / top.length);
+		this.suns = list.map((r, i) => {
+			const phi = Math.acos(1 - (2 * (i + 0.5)) / list.length);
 			const theta = Math.PI * (1 + Math.sqrt(5)) * i;
-			const R = 13.5;
+			const R = 14;
 			return {
 				name: r.name,
 				url: r.url,
 				stars: r.stars,
-				x: Math.cos(theta) * Math.sin(phi) * R * 1.6,
-				y: Math.cos(phi) * R * 0.78 + 1.5,
-				z: ORB_Z + Math.sin(theta) * Math.sin(phi) * R * 0.7
+				x: Math.cos(theta) * Math.sin(phi) * R * 1.7,
+				y: Math.cos(phi) * R * 0.7 + 2.5,
+				z: PLATE_Z[1] + Math.sin(theta) * Math.sin(phi) * R * 0.55
 			};
 		});
 
-		if (this.orbMesh && this.orbGlow && this.orbLines) {
-			this.scene.remove(this.orbMesh, this.orbGlow, this.orbLines);
-			this.orbMesh.dispose();
-			this.orbGlow.geometry.dispose();
-			this.orbLines.geometry.dispose();
+		if (this.field) {
+			this.scene.remove(this.field, this.links);
+			this.field.geometry.dispose();
+			this.links.geometry.dispose();
 		}
 
-		// instanced orbs — size by star count
-		const geo = new THREE.IcosahedronGeometry(1, this.quality === 'high' ? 2 : 1);
-		const mat = new THREE.MeshBasicMaterial({
-			color: '#2b3540',
-			transparent: true,
-			opacity: 0.5
+		// constellation points sized by stars
+		const g = new THREE.BufferGeometry();
+		const p = new Float32Array(this.suns.length * 3);
+		const s = new Float32Array(this.suns.length);
+		this.suns.forEach((o, i) => {
+			p[i * 3] = o.x;
+			p[i * 3 + 1] = o.y;
+			p[i * 3 + 2] = o.z;
+			s[i] = 0.3 + Math.pow(Math.max(o.stars, 0.4), 0.45) * 0.5;
 		});
-		const orbMesh = new THREE.InstancedMesh(geo, mat, this.orbs.length);
-		this.orbMesh = orbMesh;
-		const m = new THREE.Matrix4();
-		// small dark nodes — the visible "star" is the capped glow halo; the mesh
-		// only exists as a raycast hover target, so it can never balloon up close
-		this.orbs.forEach((o, i) => {
-			const s = 0.14 + Math.pow(Math.max(o.stars, 0.35), 0.5) * 0.05;
-			m.makeScale(s, s, s).setPosition(o.x, o.y, o.z);
-			orbMesh.setMatrixAt(i, m);
-		});
-		orbMesh.instanceMatrix.needsUpdate = true;
-		this.scene.add(orbMesh);
+		g.setAttribute('position', new THREE.BufferAttribute(p, 3));
+		g.setAttribute('aSize', new THREE.BufferAttribute(s, 1));
 
-		// glow halos
-		const gGeo = new THREE.BufferGeometry();
-		const gPos = new Float32Array(this.orbs.length * 3);
-		const gSize = new Float32Array(this.orbs.length);
-		const gCol = new Float32Array(this.orbs.length * 3);
-		const base = new THREE.Color('#cfc7b2');
-		this.orbs.forEach((o, i) => {
-			gPos[i * 3] = o.x;
-			gPos[i * 3 + 1] = o.y;
-			gPos[i * 3 + 2] = o.z;
-			gSize[i] = 0.24 + Math.pow(Math.max(o.stars, 0.35), 0.5) * 0.32;
-			const c = i < 3 ? BRASS : i < 12 ? NOVA : base;
-			gCol[i * 3] = c.r;
-			gCol[i * 3 + 1] = c.g;
-			gCol[i * 3 + 2] = c.b;
-		});
-		gGeo.setAttribute('position', new THREE.BufferAttribute(gPos, 3));
-		gGeo.setAttribute('aSize', new THREE.BufferAttribute(gSize, 1));
-		gGeo.setAttribute('aColor', new THREE.BufferAttribute(gCol, 3));
-		const gMat = new THREE.ShaderMaterial({
+		this.fieldMat = new THREE.ShaderMaterial({
 			transparent: true,
 			depthWrite: false,
-			blending: THREE.AdditiveBlending,
 			uniforms: {
 				uTime: { value: 0 },
 				uPix: { value: this.renderer.getPixelRatio() },
-				uTex: { value: radialSprite('rgba(255,238,196,.95)', 'rgba(231,184,79,.22)') }
+				uActive: { value: -1 },
+				uColor: { value: new THREE.Color(css('--brass') || '#9a7422') },
+				uInk: { value: new THREE.Color(css('--scene-1') || '#1e1b14') },
+				uTex: { value: dotTexture() }
 			},
 			vertexShader: /* glsl */ `
-				attribute vec3 aColor;
 				attribute float aSize;
-				uniform float uTime;
-				uniform float uPix;
-				varying vec3 vColor;
-				varying float vA;
+				uniform float uTime; uniform float uPix;
+				varying float vNear;
 				void main() {
-					vColor = aColor;
 					vec4 mv = modelViewMatrix * vec4(position, 1.0);
-					// fully invisible until 30 units out — nothing balloons near the camera
-					vA = smoothstep(30.0, 55.0, -mv.z);
-					float pulse = 1.0 + 0.18 * sin(uTime * 1.7 + position.x * 2.0 + position.y);
-					gl_PointSize = min(aSize * pulse * uPix * (60.0 / -mv.z), 6.0 * uPix);
+					vNear = smoothstep(6.0, 30.0, -mv.z);
+					float tw = 1.0 + 0.12 * sin(uTime * 1.3 + position.x * 2.0 + position.y);
+					gl_PointSize = min(aSize * tw * uPix * (34.0 / -mv.z), 14.0 * uPix);
 					gl_Position = projectionMatrix * mv;
 				}`,
 			fragmentShader: /* glsl */ `
-				uniform sampler2D uTex;
-				varying vec3 vColor;
-				varying float vA;
+				uniform vec3 uColor; uniform vec3 uInk; uniform sampler2D uTex;
+				varying float vNear;
 				void main() {
 					vec4 t = texture2D(uTex, gl_PointCoord);
-					gl_FragColor = vec4(vColor, t.a * 0.35 * vA);
+					vec3 c = mix(uColor, uInk, 0.25);
+					gl_FragColor = vec4(c, t.a * 0.92 * vNear);
 				}`
 		});
-		this.orbGlow = new THREE.Points(gGeo, gMat);
-		this.scene.add(this.orbGlow);
+		this.field = new THREE.Points(g, this.fieldMat);
+		this.scene.add(this.field);
 
-		// constellation links between nearest orbs
-		const linePts: number[] = [];
-		for (let i = 0; i < this.orbs.length; i++) {
-			const near = this.orbs
-				.map((o, j) => ({ j, d: (o.x - this.orbs[i].x) ** 2 + (o.y - this.orbs[i].y) ** 2 }))
+		// constellation links: connect each star to its nearest neighbour
+		const lp: number[] = [];
+		for (let i = 0; i < this.suns.length; i++) {
+			const best = this.suns
+				.map((o, j) => ({
+					j,
+					d: (o.x - this.suns[i].x) ** 2 + (o.y - this.suns[i].y) ** 2 + (o.z - this.suns[i].z) ** 2
+				}))
 				.filter((e) => e.j !== i)
 				.sort((a, b) => a.d - b.d)
-				.slice(0, 2);
-			for (const { j } of near) {
-				if (j <= i) continue;
-				linePts.push(
-					this.orbs[i].x,
-					this.orbs[i].y,
-					this.orbs[i].z,
-					this.orbs[j].x,
-					this.orbs[j].y,
-					this.orbs[j].z
+				.slice(0, 1)[0];
+			if (best && best.j > i) {
+				lp.push(
+					this.suns[i].x,
+					this.suns[i].y,
+					this.suns[i].z,
+					this.suns[best.j].x,
+					this.suns[best.j].y,
+					this.suns[best.j].z
 				);
 			}
 		}
-		const lGeo = new THREE.BufferGeometry();
-		lGeo.setAttribute('position', new THREE.Float32BufferAttribute(linePts, 3));
-		this.orbLines = new THREE.LineSegments(
-			lGeo,
-			new THREE.LineBasicMaterial({
-				color: BRASS,
-				transparent: true,
-				opacity: 0.14,
-				blending: THREE.AdditiveBlending,
-				depthWrite: false
-			})
-		);
-		this.scene.add(this.orbLines);
+		const lg = new THREE.BufferGeometry();
+		lg.setAttribute('position', new THREE.Float32BufferAttribute(lp, 3));
+		this.linkMat = new THREE.LineBasicMaterial({
+			color: new THREE.Color(css('--brass') || '#9a7422'),
+			transparent: true,
+			opacity: 0.22
+		});
+		this.links = new THREE.LineSegments(lg, this.linkMat);
+		this.scene.add(this.links);
 	}
 
-	private buildTerrain() {
+	/* ---------- plate 02: contribution ridge ---------- */
+
+	private buildRidge() {
 		const { counts, dates } = contributions;
 		const max = Math.max(...counts, 1);
-		const cell = 1.18;
+		const cell = 1.15;
 		const cols = Math.ceil(counts.length / 7);
-		const w = cols * cell;
-		const hGeo = new THREE.BoxGeometry(0.82, 1, 0.82);
-		hGeo.translate(0, 0.5, 0);
-		const hMat = new THREE.MeshBasicMaterial();
-		this.terrain = new THREE.InstancedMesh(hGeo, hMat, counts.length);
+		const geo = new THREE.BoxGeometry(0.7, 1, 0.7);
+		geo.translate(0, 0.5, 0);
+		this.ridgeMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.9 });
+		this.ridge = new THREE.InstancedMesh(geo, this.ridgeMat, counts.length);
 		const m = new THREE.Matrix4();
-		const col = new THREE.Color();
-		const cold = new THREE.Color('#1d232c');
-		const warm = new THREE.Color('#b98a2c');
+		const dayColors: THREE.Color[] = [];
+		const bg = new THREE.Color(css('--plate') || '#f2ead8');
+		const ink = new THREE.Color(css('--scene-1') || '#1e1b14');
+		const brass = new THREE.Color(css('--brass') || '#9a7422');
 		for (let i = 0; i < counts.length; i++) {
 			const week = Math.floor(i / 7);
 			const day = i % 7;
 			const x = (week - cols / 2) * cell;
-			const z = TERRAIN_Z - (day - 3) * cell;
-			const c = counts[i];
-			const norm = Math.pow(c / max, 0.62);
-			const h = 0.25 + norm * 9.5;
+			const z = PLATE_Z[2] - (day - 3) * cell;
+			const norm = Math.pow(counts[i] / max, 0.6);
+			const h = 0.2 + norm * 10;
 			m.makeScale(1, h, 1).setPosition(x, 0, z);
-			this.terrain.setMatrixAt(i, m);
-			col.copy(cold).lerp(warm, Math.min(1, norm * 1.35));
-			if (c === 0) col.multiplyScalar(0.55);
-			this.terrain.setColorAt(i, col);
-			this.dayGrid.push({ x, z, h, date: dates[i], count: c });
+			this.ridge.setMatrixAt(i, m);
+			const c = bg.clone().lerp(brass, 0.08 + Math.min(1, norm * 1.5) * 0.92);
+			this.ridge.setColorAt(i, c);
+			dayColors.push(c);
+			this.dayGrid.push({ x, z, h, date: dates[i], count: counts[i] });
 		}
-		this.terrain.instanceMatrix.needsUpdate = true;
-		if (this.terrain.instanceColor) this.terrain.instanceColor.needsUpdate = true;
-		this.scene.add(this.terrain);
+		this.ridge.instanceMatrix.needsUpdate = true;
+		if (this.ridge.instanceColor) this.ridge.instanceColor.needsUpdate = true;
+		this.scene.add(this.ridge);
 
-		// faint floor grid
-		const grid = new THREE.GridHelper(
-			w + 20,
-			28,
-			new THREE.Color('#1b1e26'),
-			new THREE.Color('#141720')
-		);
-		grid.position.set(0, -0.02, TERRAIN_Z);
+		const grid = new THREE.GridHelper(cols * cell + 16, 26, ink, ink);
+		(grid.material as THREE.Material).transparent = true;
+		(grid.material as THREE.Material).opacity = 0.12;
+		grid.position.set(0, -0.02, PLATE_Z[2]);
 		this.scene.add(grid);
 	}
 
-	private buildContact() {
-		const n = this.quality === 'high' ? 900 : 420;
-		const pos = new Float32Array(n * 3);
-		const col = new Float32Array(n * 3);
-		const c = new THREE.Color();
-		for (let i = 0; i < n; i++) {
-			const t = i / n;
-			const ang = t * Math.PI * 14;
-			const r = 3 + t * 9;
-			pos[i * 3] = Math.cos(ang) * r;
-			pos[i * 3 + 1] = 3 + Math.sin(t * Math.PI * 6) * (1.5 + t * 2.5);
-			pos[i * 3 + 2] = CONTACT_Z - 16 + Math.sin(ang) * r * 0.4;
-			c.copy(t < 0.55 ? BRASS : t < 0.8 ? CREAM : TEAL);
-			col[i * 3] = c.r;
-			col[i * 3 + 1] = c.g;
-			col[i * 3 + 2] = c.b;
-		}
-		const geo = new THREE.BufferGeometry();
-		geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-		geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
-		this.vortex = new THREE.Points(
-			geo,
-			new THREE.PointsMaterial({
-				size: 0.16,
-				vertexColors: true,
-				transparent: true,
-				opacity: 0.7,
-				blending: THREE.AdditiveBlending,
-				depthWrite: false,
-				map: radialSprite('rgba(255,255,255,1)', 'rgba(255,255,255,.3)')
-			})
-		);
-		this.scene.add(this.vortex);
+	/* ---------- plate 03: horizon sun ---------- */
 
-		this.ring = new THREE.Mesh(
-			new THREE.TorusGeometry(5.6, 0.06, 12, 120),
-			new THREE.MeshBasicMaterial({ color: BRASS, transparent: true, opacity: 0.65 })
-		);
-		this.ring.position.set(0, 3, CONTACT_Z - 18);
-		this.scene.add(this.ring);
+	private buildSun() {
+		this.sunMat = new THREE.MeshBasicMaterial({
+			color: new THREE.Color(css('--brass') || '#9a7422'),
+			transparent: true,
+			opacity: 0.9
+		});
+		this.sun = new THREE.Mesh(new THREE.TorusGeometry(6.5, 0.05, 8, 96), this.sunMat);
+		this.sun.position.set(0, 5, PLATE_Z[3] - 8);
+		this.sun.rotation.x = Math.PI / 2.25;
+		this.scene.add(this.sun);
+
+		const glow = new THREE.SpriteMaterial({
+			map: dotTexture('rgba(255,220,150,1)', 'rgba(255,190,90,0)'),
+			color: new THREE.Color(css('--brass') || '#9a7422'),
+			transparent: true,
+			opacity: 0.35,
+			blending: THREE.AdditiveBlending,
+			depthWrite: false
+		});
+		this.sunGlow = new THREE.Sprite(glow);
+		this.sunGlow.position.copy(this.sun.position);
+		this.sunGlow.scale.setScalar(22);
+		this.scene.add(this.sunGlow);
 	}
 
-	/* ---------------- interaction + frame ---------------- */
+	/* ---------- loop + interaction ---------- */
 
 	private onPointer = (e: PointerEvent) => {
 		this.mouse.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
 	};
 
-	/** document scroll fraction mapped through section keyframes → camera path t */
 	private computeP(): number {
 		const se = document.documentElement;
-		const max = se.scrollHeight - innerHeight;
-		if (max <= 0) return 0;
-		const f = scrollY / max;
-		const kf = this.keyframeMap;
+		const maxScroll = se.scrollHeight - innerHeight;
+		if (maxScroll <= 0) return 0;
+		const f = scrollY / maxScroll;
+		const kf = this.keyframes;
 		for (let i = 1; i < kf.length; i++) {
 			if (f <= kf[i][0]) {
 				const span = kf[i][0] - kf[i - 1][0] || 1;
@@ -501,42 +455,98 @@ export class Universe {
 	}
 
 	setKeyframes(map: [number, number][]) {
-		if (map.length > 1) this.keyframeMap = map;
+		if (map.length > 1) this.keyframes = map;
 	}
 
-	private raycast() {
-		if (this.quality === 'low') return;
-		this.raycaster.setFromCamera(this.mouse, this.camera);
+	/** which plate is the camera in — Stage.svelte prints it to the HUD */
+	currentPlate(): number {
+		const p = this.p;
+		if (p < 0.28) return 0;
+		if (p < 0.56) return 1;
+		if (p < 0.84) return 2;
+		return 3;
+	}
 
-		// orbs: only while the camera flies through the constellation zone
-		if (this.orbMesh && this.smoothP > 0.14 && this.smoothP < 0.58) {
-			const hit = this.raycaster.intersectObject(this.orbMesh, false)[0];
-			const idx = hit?.instanceId ?? -1;
-			this.hoverOrb = idx;
-			if (idx >= 0 && this.orbGlow) {
-				const o = this.orbs[idx];
-				const v = new THREE.Vector3(o.x, o.y + 0.6, o.z).project(this.camera);
-				this.cb.onRepoHover?.({
+	/* ---------- hover picking, called from the loop at ~12 Hz ---------- */
+
+	private loop = () => {
+		if (this.disposed) return;
+		this.raf = requestAnimationFrame(this.loop);
+		if (document.hidden) return;
+
+		const dt = Math.min(this.clock.getDelta(), 0.05);
+		this.elapsed += dt;
+		const t = this.elapsed;
+
+		// ease scroll position and camera
+		const target = this.computeP();
+		this.p += (target - this.p) * Math.min(1, dt * 4);
+		this.smooth.lerp(this.mouse, Math.min(1, dt * 3));
+
+		const pos = this.posCurve.getPointAt(this.p);
+		const look = this.lookCurve.getPointAt(Math.min(1, this.p + 0.002));
+		this.camera.position.copy(pos);
+		this.camera.position.x += this.smooth.x * 1.6;
+		this.camera.position.y += this.smooth.y * 1.0;
+		this.camera.lookAt(look);
+		this.camera.rotation.z += this.smooth.x * -0.008;
+
+		// gentle life: slow twinkle + sun pulse
+		this.starMat.uniforms.uTime.value = t;
+		if (this.fieldMat) this.fieldMat.uniforms.uTime.value = t;
+		if (this.sun) {
+			this.sun.rotation.z = t * 0.05;
+			const k = 0.32 + 0.06 * Math.sin(t * 0.5);
+			(this.sunGlow.material as THREE.SpriteMaterial).opacity = k;
+		}
+
+		// raycast throttled to ~12 Hz
+		this.rayClock += dt;
+		if (this.rayClock > 0.08) {
+			this.rayClock = 0;
+			this.raycastHover();
+		}
+
+		this.renderer.render(this.scene, this.camera);
+	};
+
+	private raycastHover() {
+		if (this.quality === 'low') return;
+		this.ray.setFromCamera(this.mouse, this.camera);
+		const plate = this.currentPlate();
+
+		if (plate === 1 && this.field) {
+			// raycast points with threshold: closest sun under cursor
+			const old = this.ray.params.Points.threshold;
+			this.ray.params.Points.threshold = 1.4;
+			const hit = this.ray.intersectObject(this.field, false)[0];
+			this.ray.params.Points.threshold = old;
+			const idx = hit?.index ?? -1;
+			if (idx !== this.hoverStar) this.hoverStar = idx;
+			if (idx >= 0) {
+				const o = this.suns[idx];
+				const v = new THREE.Vector3(o.x, o.y + 0.8, o.z).project(this.camera);
+				this.cb.onStarHover?.({
 					name: o.name,
 					url: o.url,
 					stars: o.stars,
 					sx: (v.x * 0.5 + 0.5) * innerWidth,
 					sy: (-v.y * 0.5 + 0.5) * innerHeight
 				});
-			} else this.cb.onRepoHover?.(null);
-		} else if (this.hoverOrb !== -1) {
-			this.hoverOrb = -1;
-			this.cb.onRepoHover?.(null);
+			} else this.cb.onStarHover?.(null);
+			return;
+		} else if (this.hoverStar !== -1) {
+			this.hoverStar = -1;
+			this.cb.onStarHover?.(null);
 		}
 
-		// terrain day hover
-		if (this.terrain && this.smoothP > 0.55) {
-			const hit = this.raycaster.intersectObject(this.terrain, false)[0];
+		if (plate === 2 && this.ridge) {
+			const hit = this.ray.intersectObject(this.ridge, false)[0];
 			const idx = hit?.instanceId ?? -1;
 			this.hoverDay = idx;
 			if (idx >= 0) {
 				const d = this.dayGrid[idx];
-				const v = new THREE.Vector3(d.x, d.h + 0.5, d.z).project(this.camera);
+				const v = new THREE.Vector3(d.x, d.h + 0.4, d.z).project(this.camera);
 				if (v.z < 1) {
 					this.cb.onDayHover?.({
 						date: d.date,
@@ -551,71 +561,10 @@ export class Universe {
 		this.cb.onDayHover?.(null);
 	}
 
-	private loop = () => {
-		if (this.disposed) return;
-		this.raf = requestAnimationFrame(this.loop);
-		if (document.hidden) return;
-
-		const dt = Math.min(this.clock.getDelta(), 0.05);
-		this.elapsed += dt;
-		const t = this.elapsed;
-
-		// damped scroll + pointer parallax
-		const targetP = this.computeP();
-		this.smoothP += (targetP - this.smoothP) * Math.min(1, dt * 4.2);
-		this.smoothMouse.lerp(this.mouse, Math.min(1, dt * 3));
-
-		const p = this.smoothP;
-		const pos = this.posCurve.getPointAt(p);
-		const look = this.lookCurve.getPointAt(Math.min(1, p + 0.002));
-		this.camera.position.copy(pos);
-		this.camera.position.x += this.smoothMouse.x * 2.2 * (1 - p * 0.2);
-		this.camera.position.y += this.smoothMouse.y * 1.4;
-		this.camera.lookAt(look);
-		this.camera.rotation.z += this.smoothMouse.x * -0.012;
-
-		// living elements
-		if (this.stars) (this.stars.material as THREE.ShaderMaterial).uniforms.uTime.value = t;
-		if (this.orbGlow) (this.orbGlow.material as THREE.ShaderMaterial).uniforms.uTime.value = t;
-		if (this.orbLines) this.orbLines.rotation.y += 0.00035;
-		if (this.vortex) this.vortex.rotation.y = t * 0.06;
-		if (this.ring) {
-			this.ring.rotation.x = Math.sin(t * 0.25) * 0.25 + 0.35;
-			this.ring.rotation.y = t * 0.12;
-		}
-
-		// shooting stars over the hero
-		if (this.shooters) {
-			const u = this.shooters.userData as { t: number; v: THREE.Vector3; origin: THREE.Vector3 };
-			if (u.t < 0 && Math.random() < 0.004 && p < 0.25) {
-				u.t = 0;
-				u.origin.set((Math.random() - 0.5) * 60, Math.random() * 18 - 4, -Math.random() * 40);
-				u.v.set(18 + Math.random() * 14, 6 + Math.random() * 5, -4);
-			}
-			if (u.t >= 0) {
-				u.t += dt;
-				const attr = this.shooters.geometry.attributes.position as THREE.BufferAttribute;
-				const arr = attr.array as Float32Array;
-				arr[0] = u.origin.x + u.v.x * u.t;
-				arr[1] = u.origin.y + u.v.y * u.t;
-				arr[2] = u.origin.z + u.v.z * u.t;
-				attr.needsUpdate = true;
-				(this.shooters.material as THREE.PointsMaterial).opacity = Math.max(0, 1 - u.t / 1.6);
-				if (u.t > 1.6) u.t = -1;
-			}
-		}
-
-		this.raycast();
-		this.renderer.render(this.scene, this.camera);
-	};
-
 	resize = () => {
 		this.camera.aspect = innerWidth / innerHeight;
 		this.camera.updateProjectionMatrix();
 		this.renderer.setSize(innerWidth, innerHeight, false);
-		const pix = this.renderer.getPixelRatio();
-		if (this.stars) (this.stars.material as THREE.ShaderMaterial).uniforms.uPix.value = pix;
-		if (this.orbGlow) (this.orbGlow.material as THREE.ShaderMaterial).uniforms.uPix.value = pix;
 	};
 
 	dispose() {
@@ -625,10 +574,9 @@ export class Universe {
 		removeEventListener('pointermove', this.onPointer);
 		this.scene.traverse((o) => {
 			const mesh = o as THREE.Mesh;
-			if (mesh.geometry) mesh.geometry.dispose();
-			const material = (mesh as THREE.Mesh).material as
-				THREE.Material | THREE.Material[] | undefined;
-			const list = Array.isArray(material) ? material : material ? [material] : [];
+			mesh.geometry?.dispose?.();
+			const mat = mesh.material as THREE.Material | THREE.Material[] | undefined;
+			const list = Array.isArray(mat) ? mat : mat ? [mat] : [];
 			for (const mm of list) {
 				mm.dispose();
 				const withMap = mm as THREE.PointsMaterial;
