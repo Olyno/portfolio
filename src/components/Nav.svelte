@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import { LINKS } from '$lib/links';
 	import { ICONS } from '$lib/icons';
+	import XLogo from '$components/XLogo.svelte';
 	import { paletteOpen } from '$lib/palette';
 	import { m } from '$lib/paraglide/messages.js';
 	import { toggleLocale, readCookieLocale, localeVersion } from '$lib/locale';
@@ -54,8 +55,8 @@
 	const headerCls = $derived(
 		`fixed inset-x-0 top-0 z-50 transition-colors duration-500 ${
 			scrolled || open
-				? 'border-b border-[var(--line)] bg-[color-mix(in_srgb,var(--plate)_88%,transparent)] backdrop-blur-md'
-				: 'border-b border-transparent [background:linear-gradient(to_bottom,color-mix(in_srgb,var(--plate)_72%,transparent),transparent)]'
+				? 'border-b border-[var(--line)] bg-[var(--plate)]'
+				: 'border-b border-transparent [background:linear-gradient(to_bottom,var(--plate)_98%,var(--plate)_70%,transparent_112%)]'
 		}`
 	);
 </script>
@@ -133,9 +134,7 @@
 				class="hidden h-8 w-8 place-items-center rounded-md border border-[var(--line)] text-[var(--tx-dim)] transition-colors hover:border-[var(--brass)] hover:text-[var(--brass)] sm:grid"
 				aria-label={m.a11y_x()}
 			>
-				<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"
-					><path d={ICONS.x}></path></svg
-				>
+				<XLogo size={12} />
 			</a>
 
 			<button

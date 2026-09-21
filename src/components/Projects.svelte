@@ -3,6 +3,7 @@
 	import { gh } from '$lib/github';
 	import { LINKS } from '$lib/links';
 	import { ICONS } from '$lib/icons';
+	import XLogo from '$components/XLogo.svelte';
 	import { reveal, counter } from '$lib/attach';
 	import { m } from '$lib/paraglide/messages.js';
 	import { localeVersion } from '$lib/locale';
@@ -260,9 +261,7 @@
 						rel="noopener noreferrer"
 						class="inline-flex items-center gap-1.5 font-mono text-xs text-[var(--tx-faint)] transition-colors hover:text-[var(--brass)]"
 					>
-						<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"
-							><path d={ICONS.x}></path></svg
-						>
+						<XLogo size={12} />
 						@hello_modaduck
 					</a>
 				</div>

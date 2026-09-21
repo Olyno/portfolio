@@ -2,6 +2,7 @@
 	import { m } from '$lib/paraglide/messages.js';
 	import { localeVersion } from '$lib/locale';
 	import { ICONS } from '$lib/icons';
+	import XLogo from '$components/XLogo.svelte';
 	import { LINKS } from '$lib/links';
 	import { scrollToEl } from '$lib/scroller';
 
@@ -22,9 +23,7 @@
 				class="grid h-8 w-8 place-items-center rounded-md border border-[var(--line)] text-[var(--tx-dim)] transition-colors hover:border-[var(--brass)] hover:text-[var(--brass)]"
 				aria-label={m.a11y_x()}
 			>
-				<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"
-					><path d={ICONS.x}></path></svg
-				>
+				<XLogo size={12} />
 			</a>
 			<a
 				href={LINKS.github}

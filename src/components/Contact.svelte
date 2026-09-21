@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { LINKS, email } from '$lib/links';
 	import { ICONS } from '$lib/icons';
+	import XLogo from '$components/XLogo.svelte';
 	import { reveal } from '$lib/attach';
 	import { magnetic } from '$lib/attach';
 	import { m } from '$lib/paraglide/messages.js';
@@ -24,7 +25,7 @@
 	}
 
 	const cards = $derived([
-		{ href: LINKS.x, label: m.contact_x_cta(), sub: '@Olyno_', icon: ICONS.x, fill: true },
+		{ href: LINKS.x, label: m.contact_x_cta(), sub: '@Olyno_', icon: 'x', fill: true },
 		{
 			href: LINKS.github,
 			label: m.contact_github_cta(),
@@ -88,18 +89,25 @@
 					{@attach reveal(0)}
 					data-cursor
 				>
-					<svg
-						width="16"
-						height="16"
-						viewBox="0 0 24 24"
-						fill={c.fill ? 'currentColor' : 'none'}
-						stroke={c.fill ? 'none' : 'currentColor'}
-						stroke-width="1.8"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						class="shrink-0 text-[var(--tx-dim)] transition-colors group-hover:text-[var(--brass)]"
-						><path d={c.icon}></path></svg
-					>
+					{#if c.icon === 'x'}
+						<XLogo
+							size={16}
+							cls="text-[var(--tx-dim)] transition-colors group-hover:text-[var(--brass)]"
+						/>
+					{:else}
+						<svg
+							width="16"
+							height="16"
+							viewBox="0 0 24 24"
+							fill={c.fill ? 'currentColor' : 'none'}
+							stroke={c.fill ? 'none' : 'currentColor'}
+							stroke-width="1.8"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							class="shrink-0 text-[var(--tx-dim)] transition-colors group-hover:text-[var(--brass)]"
+							><path d={c.icon}></path></svg
+						>
+					{/if}
 					<span class="min-w-0">
 						<span class="block text-sm font-semibold group-hover:text-[var(--brass)]"
 							>{c.label}</span
