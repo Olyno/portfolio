@@ -91,10 +91,13 @@ export const gh = writable<GhState>({
 });
 
 export const contributions = {
+	year: (contrib.year ?? 2026) as number,
 	start: contrib.start as string,
 	dates: contrib.dates as string[],
 	counts: contrib.counts as number[]
 };
+
+export const contribYear = contributions.year;
 
 export const totalContribs = contrib.counts.reduce((a, b) => a + b, 0);
 

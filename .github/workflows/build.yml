@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - master
+  # keep the contribution terrain fresh even without code changes —
+  # the data is public (profile calendar), no secrets involved
+  schedule:
+    - cron: '17 6 * * *'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -26,6 +31,10 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Refresh contribution data
+        run: node scripts/refresh-contrib.mjs
+        continue-on-error: true
 
       - name: Typecheck
         run: pnpm check

@@ -43,3 +43,15 @@
   to #07090d vs light #f6efdf. Avatar: a design must *compose* the portrait (220px framed plate +
   caption), not staple a 72px ring to a corner. Brand icons: ship the official artwork as real
   `<img>` pairs (black/white), not span/mask approximations, until asked otherwise.
+- **Contribution terrain was static (bug, fixed 2026-10-24):** `contrib.json` is baked at build; only
+  repos/user refreshed client-side. GitHub's GraphQL calendar needs a token AND is CORS-blocked in
+  the browser — so refresh happens in CI, not the client. `scripts/refresh-contrib.mjs` scrapes the
+  PUBLIC profile fragment (`GET /users/<u>/contributions`, header `X-Requested-With: XMLHttpRequest`)
+  whose tooltips carry exact per-day counts — NO TOKEN, nothing secret, no new repo secret. Wired as
+  a pre-build step + daily cron (06:17) + workflow_dispatch, all `continue-on-error` so a markup
+  change can never break deploy (snapshot just ages a day). contrib.json now carries `year`; every
+  "2026" label is a `{y}` param (contribYear / new Date().getFullYear()) so it survives into 2027.
+  Heatmap re-rendered to place cells by real weekday (calendar-week columns), robust to baked order.
+- **edit tool stale anchors:** PUT to a remapped line silently corrupted Activity.svelte (dropped a
+  `</div>`). When the tool warns "Recovered by remapping stale line anchors", the placement is NOT
+  trustworthy — re-read the region before trusting, or use write for surgical multi-hunk fixes.

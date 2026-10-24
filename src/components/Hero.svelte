@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { LINKS } from '$lib/links';
 	import { magnetic } from '$lib/attach';
-	import { gh, totalContribs } from '$lib/github';
+	import { contribYear, gh, totalContribs } from '$lib/github';
 	import { m } from '$lib/paraglide/messages.js';
 	import { localeVersion } from '$lib/locale';
 	import XLogo from '$components/XLogo.svelte';
@@ -192,7 +192,7 @@
 			</div>
 			<div>
 				<dd class="serif text-2xl text-[var(--brass)]">{totalContribs.toLocaleString('en')}</dd>
-				<dt class="data-label">{m.hero_meta_contribs()}</dt>
+				<dt class="data-label">{m.hero_meta_contribs({ y: contribYear })}</dt>
 			</div>
 			<div>
 				<dd class="serif text-2xl text-[var(--tx)]">{since}</dd>

@@ -1,37 +1,56 @@
 <script lang="ts">
-	import { contributions, totalContribs } from '$lib/github';
+	import { contributions, contribYear, totalContribs } from '$lib/github';
 	import { reveal } from '$lib/attach';
 	import { m } from '$lib/paraglide/messages.js';
 	import { localeVersion } from '$lib/locale';
 	import { getLocale } from '$lib/paraglide/runtime.js';
 
 	const { counts, dates } = contributions;
+	const year = contribYear;
 	const max = Math.max(...counts, 1);
 
+	// calendar-week columns (Sun first), placed by weekday — robust to any
+	// cell ordering in the baked snapshot; future days simply never paint.
 	const weeks = $derived.by(() => {
 		void $localeVersion;
 		const locale = getLocale();
 		const today = new Date().toISOString().slice(0, 10);
+
+		const map = new Map<string, { date: string; count: number }[]>();
+		for (let i = 0; i < counts.length; i++) {
+			const date = dates[i];
+			if (!date || date > today || date.slice(0, 4) !== String(year)) continue;
+			const d = new Date(date + 'T00:00:00Z');
+			const sunday = new Date(d);
+			sunday.setUTCDate(sunday.getUTCDate() - sunday.getUTCDay());
+			const key = sunday.toISOString().slice(0, 10);
+			const col = map.get(key) ?? new Array(7).fill(null);
+			col[d.getUTCDay()] = { date, count: counts[i] };
+			map.set(key, col);
+		}
+
 		const out: { cells: { date: string; count: number; level: number }[]; month: string | null }[] =
 			[];
-		let col: { date: string; count: number; level: number }[] = [];
 		let lastMonth = -1;
-		for (let i = 0; i < counts.length; i++) {
-			if (dates[i] > today) break;
-			const d = new Date(dates[i] + 'T00:00:00Z');
-			const c = counts[i];
-			const ratio = c / max;
-			const level = c === 0 ? 0 : ratio > 0.6 ? 4 : ratio > 0.3 ? 3 : ratio > 0.12 ? 2 : 1;
-			col.push({ date: dates[i], count: c, level });
-			if (col.length === 7) {
-				const month = d.getUTCMonth();
-				const label = month !== lastMonth ? d.toLocaleDateString(locale, { month: 'short' }) : null;
-				lastMonth = month;
-				out.push({ cells: col, month: label });
-				col = [];
-			}
+		for (const key of [...map.keys()].sort()) {
+			const col = map.get(key)!;
+			const cells = col
+				.map((c) => c)
+				.filter((c): c is { date: string; count: number } => !!c)
+				.map((c) => {
+					const ratio = c.count / max;
+					const level =
+						c.count === 0 ? 0 : ratio > 0.6 ? 4 : ratio > 0.3 ? 3 : ratio > 0.12 ? 2 : 1;
+					return { ...c, level };
+				});
+			if (!cells.length) continue;
+			const last = new Date(cells[cells.length - 1].date + 'T00:00:00Z');
+			const month = last.getUTCMonth();
+			const label =
+				month !== lastMonth ? last.toLocaleDateString(locale, { month: 'short' }) : null;
+			lastMonth = month;
+			out.push({ cells, month: label });
 		}
-		if (col.length) out.push({ cells: col, month: null });
 		return out;
 	});
 
@@ -72,7 +91,7 @@
 		<div>
 			<p class="data-label mb-2">№ 04 — {m.nav_activity()}</p>
 			<h2 class="serif text-[clamp(2.2rem,6vw,4rem)]">{m.contrib_title()}</h2>
-			<p class="mt-3 max-w-xl text-[var(--tx-dim)]">{m.contrib_subtitle()}</p>
+			<p class="mt-3 max-w-xl text-[var(--tx-dim)]">{m.contrib_subtitle({ y: year })}</p>
 		</div>
 	</header>
 
@@ -118,7 +137,7 @@
 		<dl class="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
 			<div class="tick card px-5 py-4" {@attach reveal(60)}>
 				<dd class="serif text-3xl text-[var(--brass)]">{totalContribs.toLocaleString('en')}</dd>
-				<dt class="data-label mt-1">{m.contrib_total({ n: totalContribs })}</dt>
+				<dt class="data-label mt-1">{m.contrib_total({ n: totalContribs.toLocaleString('en'), y: year })}</dt>
 			</div>
 			<div class="tick card px-5 py-4" {@attach reveal(120)}>
 				<dd class="serif text-3xl">{active.toLocaleString('en')}</dd>

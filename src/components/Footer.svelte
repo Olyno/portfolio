@@ -13,7 +13,9 @@
 	<div
 		class="mx-auto flex max-w-shell flex-col items-center justify-between gap-5 px-5 py-8 sm:flex-row"
 	>
-		<p class="font-mono text-[0.66rem] text-[var(--tx-faint)]">{m.footer_rights()}</p>
+		<p class="font-mono text-[0.66rem] text-[var(--tx-faint)]">
+			{m.footer_rights({ y: new Date().getFullYear() })}
+		</p>
 
 		<nav class="flex items-center gap-2" aria-label="social">
 			<a

@@ -56,10 +56,11 @@
 
 	const [patchbay, modaduck] = $derived([curated[0], curated[1]]);
 
-	// 2026 field log — everything actually touched this year, from live data
-	const log2026 = $derived(
+	// field log — everything actually touched this year, from live data
+	const thisYear = String(new Date().getFullYear());
+	const log = $derived(
 		repos
-			.filter((r) => r.updated >= '2026-01-01')
+			.filter((r) => r.updated >= `${thisYear}-01-01`)
 			.sort((a, b) => (a.updated < b.updated ? 1 : -1))
 			.slice(0, 8)
 	);
@@ -280,12 +281,12 @@
 		</article>
 	{/if}
 
-	<!-- ============ field log 2026 — what actually happened this year ============ -->
+	<!-- ============ field log — what actually happened this year ============ -->
 	<div class="mt-16" {@attach reveal()}>
-		<p class="data-label mb-2">№ 02 — {m.timeline_kicker()}</p>
-		<h3 class="serif text-3xl">{m.timeline_title()}</h3>
+		<p class="data-label mb-2">№ 02 — {m.timeline_kicker({ y: thisYear })}</p>
+		<h3 class="serif text-3xl">{m.timeline_title({ y: thisYear })}</h3>
 		<ol class="timeline mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-			{#each log2026 as r (r.name)}
+			{#each log as r (r.name)}
 				<li>
 					<a
 						href={r.url}
